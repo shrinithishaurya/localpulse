@@ -1,40 +1,40 @@
 <!DOCTYPE html>
 <html lang="en" data-theme="dark">
+<!--
+  ============================================================
+  LocalPulse — Tempe, AZ Local Business Directory
+  FBLA Coding & Programming 2025-2026
+
+  BACKEND: Firebase (Authentication + Firestore)
+  - Google Sign-In for all users (no fake accounts)
+  - Vendor accounts require admin approval code
+  - All data stored in Firestore cloud database
+  - Real-time updates via Firestore listeners
+  - Admin panel for managing listings + approvals
+
+  TO SET UP:
+  1. Go to firebase.google.com → create project
+  2. Enable Authentication → Google + Email/Password
+  3. Enable Firestore Database
+  4. Copy your config and paste into FIREBASE CONFIG section below
+  ============================================================
+-->
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LocalPulse — Tempe, AZ Local Business Directory</title>
 <link href="https://fonts.googleapis.com/css2?family=Instrument+Serif:ital@0;1&family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+
 <style>
-:root {
-  --accent:#3B82F6;--accent-h:#2563EB;--accent-dim:rgba(59,130,246,0.14);--accent-b:rgba(59,130,246,0.32);
-  --gold:#F59E0B;--gold-dim:rgba(245,158,11,0.12);--green:#10B981;--red:#EF4444;
-  --r:10px;--rsm:6px;--rlg:16px;--rxl:22px;--tr:0.18s ease;
-}
-[data-theme="dark"]{
-  --bg:#0A0E17;--bg2:#111520;--bg3:#181D2B;--bg4:#1E2436;
-  --bd:rgba(255,255,255,0.07);--bds:rgba(255,255,255,0.13);
-  --tx:#F0F4FF;--tx2:#9BA8C0;--tx3:#5A6480;
-  --sh:0 4px 24px rgba(0,0,0,0.5);--shl:0 12px 48px rgba(0,0,0,0.6);
-  --hdr:#080C14;
-}
-[data-theme="light"]{
-  --bg:#F4F6FB;--bg2:#FFFFFF;--bg3:#EEF2FA;--bg4:#E4EAF5;
-  --bd:rgba(15,23,42,0.08);--bds:rgba(15,23,42,0.15);
-  --tx:#0F172A;--tx2:#475569;--tx3:#94A3B8;
-  --sh:0 2px 12px rgba(15,23,42,0.08);--shl:0 8px 32px rgba(15,23,42,0.13);
-  --hdr:#0B1929;
-}
+:root{--accent:#3B82F6;--accent-h:#2563EB;--accent-dim:rgba(59,130,246,0.14);--accent-b:rgba(59,130,246,0.32);--gold:#F59E0B;--gold-dim:rgba(245,158,11,0.12);--green:#10B981;--red:#EF4444;--r:10px;--rsm:6px;--rlg:16px;--rxl:22px;--tr:0.18s ease;}
+[data-theme="dark"]{--bg:#0A0E17;--bg2:#111520;--bg3:#181D2B;--bg4:#1E2436;--bd:rgba(255,255,255,0.07);--bds:rgba(255,255,255,0.13);--tx:#F0F4FF;--tx2:#9BA8C0;--tx3:#5A6480;--sh:0 4px 24px rgba(0,0,0,0.5);--shl:0 12px 48px rgba(0,0,0,0.6);--hdr:#080C14;}
+[data-theme="light"]{--bg:#F4F6FB;--bg2:#FFFFFF;--bg3:#EEF2FA;--bg4:#E4EAF5;--bd:rgba(15,23,42,0.08);--bds:rgba(15,23,42,0.15);--tx:#0F172A;--tx2:#475569;--tx3:#94A3B8;--sh:0 2px 12px rgba(15,23,42,0.08);--shl:0 8px 32px rgba(15,23,42,0.13);--hdr:#0B1929;}
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{font-size:16px;scroll-behavior:smooth;}
 body{font-family:'Geist',-apple-system,sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;transition:background var(--tr),color var(--tr);line-height:1.6;}
 button,input,select,textarea{font-family:inherit;font-size:inherit;}
 a{text-decoration:none;color:inherit;}
-::-webkit-scrollbar{width:5px;}
-::-webkit-scrollbar-track{background:transparent;}
-::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
-
-/* ── HEADER ── */
+::-webkit-scrollbar{width:5px;}::-webkit-scrollbar-track{background:transparent;}::-webkit-scrollbar-thumb{background:var(--bg4);border-radius:3px;}
 header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px solid rgba(255,255,255,0.06);backdrop-filter:blur(16px);}
 .hi{max-width:1240px;margin:0 auto;padding:0 1.5rem;height:60px;display:flex;align-items:center;gap:1.1rem;}
 .logo{display:flex;align-items:center;gap:0.5rem;cursor:pointer;flex-shrink:0;}
@@ -44,14 +44,12 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
 .logo-name em{font-style:italic;color:#60A5FA;}
 .loc{display:flex;align-items:center;gap:0.35rem;font-size:0.75rem;font-weight:500;color:rgba(255,255,255,0.38);padding-left:0.9rem;border-left:1px solid rgba(255,255,255,0.08);flex-shrink:0;}
 .loc svg{width:10px;height:10px;fill:#60A5FA;}
-.hsearch{flex:1;max-width:400px;position:relative;}
+.hsearch{flex:1;max-width:380px;position:relative;}
 .hsearch svg{position:absolute;left:0.7rem;top:50%;transform:translateY(-50%);width:13px;height:13px;fill:rgba(255,255,255,0.22);pointer-events:none;}
 .hsearch input{width:100%;padding:0.48rem 0.9rem 0.48rem 2.25rem;background:rgba(255,255,255,0.06);border:1px solid rgba(255,255,255,0.09);border-radius:var(--rsm);color:#fff;font-size:0.83rem;outline:none;transition:border-color var(--tr),background var(--tr);}
 .hsearch input::placeholder{color:rgba(255,255,255,0.26);}
 .hsearch input:focus{border-color:var(--accent);background:rgba(255,255,255,0.09);}
 .hright{display:flex;align-items:center;gap:0.55rem;margin-left:auto;flex-shrink:0;}
-
-/* Theme toggle pill */
 .tt{width:50px;height:26px;background:var(--bg4);border:1px solid var(--bds);border-radius:999px;cursor:pointer;position:relative;transition:background var(--tr);flex-shrink:0;}
 [data-theme="light"] .tt{background:var(--accent);}
 .tt-k{position:absolute;top:2px;left:2px;width:20px;height:20px;background:#fff;border-radius:50%;transition:transform 0.22s cubic-bezier(0.34,1.56,0.64,1);display:flex;align-items:center;justify-content:center;}
@@ -64,32 +62,31 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
 .addbtn{padding:0.42rem 0.9rem;background:var(--accent);color:#fff;border:none;border-radius:var(--rsm);font-size:0.8rem;font-weight:600;cursor:pointer;display:flex;align-items:center;gap:0.3rem;transition:background var(--tr),box-shadow var(--tr);white-space:nowrap;}
 .addbtn svg{width:11px;height:11px;fill:#fff;}
 .addbtn:hover{background:var(--accent-h);box-shadow:0 4px 14px rgba(59,130,246,0.32);}
-
-/* ── HERO ── */
-#hero{background:var(--hdr);padding:3.5rem 1.5rem 2.75rem;position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,0.05);}
+.user-chip{display:flex;align-items:center;gap:0.45rem;padding:0.3rem 0.7rem 0.3rem 0.4rem;background:var(--bg3);border:1px solid var(--bds);border-radius:999px;cursor:pointer;transition:all var(--tr);}
+.user-chip:hover{border-color:var(--accent);}
+.user-avatar{width:22px;height:22px;border-radius:50%;background:var(--accent);display:flex;align-items:center;justify-content:center;font-size:0.65rem;font-weight:700;color:#fff;overflow:hidden;}
+.user-chip-name{font-size:0.75rem;font-weight:500;color:var(--tx2);max-width:80px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.vendor-dot{width:6px;height:6px;border-radius:50%;background:var(--gold);flex-shrink:0;}
+#hero{background:var(--hdr);padding:4rem 1.5rem 3.25rem;position:relative;overflow:hidden;border-bottom:1px solid rgba(255,255,255,0.05);}
 #hero::before{content:'';position:absolute;inset:0;background:radial-gradient(ellipse 55% 80% at 78% 40%,rgba(59,130,246,0.1) 0%,transparent 70%),radial-gradient(ellipse 35% 50% at 18% 75%,rgba(16,185,129,0.06) 0%,transparent 60%);pointer-events:none;}
 #hero::after{content:'';position:absolute;inset:0;background-image:linear-gradient(rgba(255,255,255,0.022) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.022) 1px,transparent 1px);background-size:48px 48px;mask-image:radial-gradient(ellipse 80% 100% at 50% 0%,black 30%,transparent 100%);pointer-events:none;}
-.hero-in{max-width:1240px;margin:0 auto;position:relative;z-index:1;}
+.hero-in{max-width:700px;margin:0 auto;position:relative;z-index:1;text-align:center;}
 .hero-tag{display:inline-flex;align-items:center;gap:0.45rem;font-size:0.7rem;font-weight:600;text-transform:uppercase;letter-spacing:0.1em;color:var(--accent);background:rgba(59,130,246,0.11);border:1px solid rgba(59,130,246,0.24);padding:0.28rem 0.75rem;border-radius:999px;margin-bottom:1.1rem;}
 .hero-tag svg{width:9px;height:9px;fill:currentColor;}
-.hero-h1{font-family:'Instrument Serif',serif;font-size:clamp(2rem,4.2vw,3.1rem);font-weight:400;color:#fff;line-height:1.12;letter-spacing:-0.02em;margin-bottom:0.8rem;}
+.hero-h1{font-family:'Instrument Serif',serif;font-size:clamp(2.2rem,4.5vw,3.4rem);font-weight:400;color:#fff;line-height:1.12;letter-spacing:-0.02em;margin-bottom:0.8rem;}
 .hero-h1 em{font-style:italic;color:#60A5FA;}
-.hero-sub{font-size:0.95rem;color:rgba(255,255,255,0.43);max-width:460px;line-height:1.65;margin-bottom:1.75rem;}
-.hero-sb{display:flex;max-width:580px;border-radius:var(--r);overflow:hidden;box-shadow:0 8px 36px rgba(0,0,0,0.38);border:1px solid rgba(255,255,255,0.09);}
-.hero-sb input{flex:1;padding:0.85rem 1rem;background:rgba(255,255,255,0.06);border:none;color:#fff;font-size:0.9rem;outline:none;}
+.hero-sub{font-size:0.97rem;color:rgba(255,255,255,0.43);line-height:1.65;margin-bottom:1.9rem;}
+.hero-sb{display:flex;max-width:580px;margin:0 auto;border-radius:var(--r);overflow:hidden;box-shadow:0 8px 36px rgba(0,0,0,0.38);border:1px solid rgba(255,255,255,0.09);}
+.hero-sb input{flex:1;padding:0.88rem 1rem;background:rgba(255,255,255,0.06);border:none;color:#fff;font-size:0.9rem;outline:none;}
 .hero-sb input::placeholder{color:rgba(255,255,255,0.3);}
-.hero-sb select{padding:0.85rem 0.75rem;background:rgba(255,255,255,0.06);border:none;border-left:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);font-size:0.8rem;outline:none;cursor:pointer;min-width:125px;}
+.hero-sb select{padding:0.88rem 0.75rem;background:rgba(255,255,255,0.06);border:none;border-left:1px solid rgba(255,255,255,0.07);color:rgba(255,255,255,0.6);font-size:0.8rem;outline:none;cursor:pointer;min-width:130px;}
 .hero-sb select option{background:#111520;color:#fff;}
-.hero-sb button{padding:0.85rem 1.3rem;background:var(--accent);border:none;color:#fff;font-size:0.83rem;font-weight:600;cursor:pointer;transition:background var(--tr);white-space:nowrap;}
+.hero-sb button{padding:0.88rem 1.3rem;background:var(--accent);border:none;color:#fff;font-size:0.83rem;font-weight:600;cursor:pointer;transition:background var(--tr);white-space:nowrap;}
 .hero-sb button:hover{background:var(--accent-h);}
-.hero-stats{display:flex;gap:2.25rem;margin-top:2rem;flex-wrap:wrap;}
+.hero-stats{display:flex;justify-content:center;gap:2.5rem;margin-top:2.2rem;flex-wrap:wrap;}
 .hs-val{font-family:'Instrument Serif',serif;font-size:1.6rem;color:#fff;line-height:1;}
 .hs-lbl{font-size:0.7rem;color:rgba(255,255,255,0.35);margin-top:0.18rem;font-weight:500;text-transform:uppercase;letter-spacing:0.06em;}
-
-/* ── LAYOUT ── */
 #shell{max-width:1240px;margin:0 auto;padding:1.75rem 1.5rem 5rem;display:grid;grid-template-columns:230px 1fr;gap:1.6rem;align-items:start;}
-
-/* ── SIDEBAR ── */
 #sb{position:sticky;top:72px;display:flex;flex-direction:column;gap:0.9rem;}
 .sp{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);overflow:hidden;}
 .sph{padding:0.8rem 1rem;border-bottom:1px solid var(--bd);display:flex;align-items:center;justify-content:space-between;}
@@ -98,7 +95,6 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
 .catbtn{width:100%;display:flex;align-items:center;gap:0.55rem;padding:0.46rem 0.6rem;border-radius:var(--rsm);border:none;background:transparent;color:var(--tx2);font-size:0.83rem;font-weight:500;cursor:pointer;text-align:left;transition:all var(--tr);}
 .catbtn svg{width:14px;height:14px;fill:currentColor;opacity:0.55;flex-shrink:0;}
 .catbtn:hover{background:var(--bg3);color:var(--tx);}
-.catbtn:hover svg{opacity:1;}
 .catbtn.on{background:var(--accent-dim);color:var(--accent);border:1px solid var(--accent-b);}
 .catbtn.on svg{opacity:1;}
 .cpill{margin-left:auto;font-size:0.66rem;font-family:'Geist Mono',monospace;background:var(--bg3);color:var(--tx3);padding:0.1rem 0.38rem;border-radius:999px;}
@@ -110,7 +106,7 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
 .srtbtn.on svg{opacity:1;}
 .srt-radio{width:13px;height:13px;border-radius:50%;border:2px solid var(--bds);margin-left:auto;flex-shrink:0;transition:all var(--tr);}
 .srtbtn.on .srt-radio{border-color:var(--green);background:var(--green);box-shadow:0 0 0 3px rgba(16,185,129,0.15);}
-.deal-row{padding:0.75rem 0;border-bottom:1px solid var(--bd);}
+.deal-row{padding:0.72rem 0;border-bottom:1px solid var(--bd);}
 .deal-row:last-child{border-bottom:none;padding-bottom:0.3rem;}
 .dr-name{font-size:0.82rem;font-weight:600;color:var(--tx);margin-bottom:0.18rem;}
 .dr-txt{font-size:0.76rem;color:var(--tx2);line-height:1.4;margin-bottom:0.32rem;}
@@ -119,14 +115,10 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
 .cpybtn{font-size:0.68rem;font-weight:600;color:var(--accent);background:none;border:none;cursor:pointer;padding:0;}
 .cpybtn:hover{text-decoration:underline;}
 .livebdg{font-size:0.6rem;font-weight:700;text-transform:uppercase;letter-spacing:0.06em;color:var(--green);background:rgba(16,185,129,0.11);border:1px solid rgba(16,185,129,0.24);padding:0.13rem 0.42rem;border-radius:999px;}
-
-/* ── MAIN ── */
 #main{min-width:0;}
 .toolbar{display:flex;align-items:center;justify-content:space-between;margin-bottom:1.1rem;gap:0.75rem;flex-wrap:wrap;}
 .rescnt{font-size:0.83rem;color:var(--tx2);}
 .rescnt strong{color:var(--tx);font-weight:600;}
-
-/* ── CARD GRID ── */
 #bgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:1rem;}
 .bcard{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--rlg);overflow:hidden;cursor:pointer;transition:transform 0.2s ease,box-shadow 0.2s ease,border-color 0.2s ease;display:flex;flex-direction:column;}
 .bcard:hover{transform:translateY(-3px);box-shadow:var(--shl);border-color:var(--bds);}
@@ -140,7 +132,6 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
 .bkbtn{position:absolute;bottom:0.6rem;right:0.6rem;z-index:2;width:28px;height:28px;border-radius:50%;background:rgba(8,12,20,0.68);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,0.11);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all var(--tr);}
 .bkbtn svg{width:12px;height:12px;fill:rgba(255,255,255,0.65);}
 .bkbtn:hover{background:rgba(8,12,20,0.9);}
-.bkbtn:hover svg{fill:#fff;}
 .bkbtn.saved{background:var(--gold);border-color:var(--gold);}
 .bkbtn.saved svg{fill:#000;}
 .cbody{padding:0.95rem 1.05rem;flex:1;display:flex;flex-direction:column;}
@@ -159,8 +150,6 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
 .rct{font-size:0.71rem;color:var(--tx3);}
 .vbtn{font-size:0.74rem;font-weight:600;color:var(--accent);background:var(--accent-dim);border:none;padding:0.26rem 0.65rem;border-radius:var(--rsm);cursor:pointer;transition:all var(--tr);}
 .vbtn:hover{background:var(--accent);color:#fff;}
-
-/* ── MODAL ── */
 .ovl{position:fixed;inset:0;z-index:200;background:rgba(0,0,0,0.65);backdrop-filter:blur(6px);display:flex;align-items:center;justify-content:center;padding:1.5rem;opacity:0;pointer-events:none;transition:opacity 0.22s ease;}
 .ovl.open{opacity:1;pointer-events:all;}
 .modal{background:var(--bg2);border:1px solid var(--bds);border-radius:var(--rxl);width:100%;max-width:620px;max-height:88vh;overflow-y:auto;box-shadow:0 32px 96px rgba(0,0,0,0.5);transform:scale(0.96) translateY(12px);transition:transform 0.22s ease;}
@@ -196,7 +185,7 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
 .wrev{background:var(--bg3);border:1px solid var(--bd);border-radius:var(--r);padding:1.15rem;margin-top:1.15rem;}
 .fg{margin-bottom:0.85rem;}
 .flbl{font-size:0.75rem;font-weight:600;color:var(--tx);display:block;margin-bottom:0.32rem;}
-.fi,.fta,.fsel{width:100%;padding:0.57rem 0.8rem;background:var(--bg2);border:1px solid var(--bds);border-radius:var(--rsm);color:var(--tx);font-size:0.85rem;outline:none;transition:border-color var(--tr),box-shadow var(--tr);}
+.fi,.fta,.fsel{width:100%;padding:0.57rem 0.8rem;background:var(--bg2);border:1.5px solid var(--bds);border-radius:var(--rsm);color:var(--tx);font-size:0.85rem;outline:none;transition:border-color var(--tr),box-shadow var(--tr);}
 .fi:focus,.fta:focus,.fsel:focus{border-color:var(--accent);box-shadow:0 0 0 3px rgba(59,130,246,0.11);}
 .fta{resize:vertical;min-height:75px;}
 .fsel{cursor:pointer;}
@@ -206,7 +195,8 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
 .spr{display:flex;gap:0.28rem;}
 .sps{font-size:1.45rem;cursor:pointer;color:var(--bg4);transition:color 0.12s,transform 0.12s;line-height:1;}
 .sps:hover,.sps.on{color:var(--gold);transform:scale(1.17);}
-.cptr{display:flex;align-items:center;gap:0.8rem;background:var(--bg2);border:1px solid var(--bds);border-radius:var(--rsm);padding:0.7rem 0.95rem;cursor:pointer;user-select:none;}
+.cptr{display:flex;align-items:center;gap:0.8rem;background:var(--bg2);border:1.5px solid var(--bds);border-radius:var(--rsm);padding:0.7rem 0.95rem;cursor:pointer;user-select:none;transition:border-color var(--tr);}
+.cptr:hover{border-color:var(--accent);}
 .cbox{width:19px;height:19px;border-radius:3px;border:2px solid var(--bds);background:var(--bg3);display:flex;align-items:center;justify-content:center;transition:all var(--tr);flex-shrink:0;}
 .cbox.on{background:var(--green);border-color:var(--green);}
 .cbox svg{width:11px;height:11px;fill:#fff;display:none;}
@@ -216,8 +206,19 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
 .cshld svg{width:20px;height:20px;fill:var(--tx);}
 .subbtn{width:100%;padding:0.72rem;background:var(--accent);color:#fff;border:none;border-radius:var(--rsm);font-size:0.88rem;font-weight:600;cursor:pointer;transition:background var(--tr),box-shadow var(--tr);}
 .subbtn:hover{background:var(--accent-h);box-shadow:0 4px 14px rgba(59,130,246,0.28);}
-
-/* ── ALT VIEWS ── */
+.subbtn:disabled{opacity:0.6;cursor:not-allowed;}
+.auth-tabs{display:flex;border-bottom:1px solid var(--bd);margin-bottom:1.3rem;}
+.auth-tab{flex:1;padding:0.75rem;background:none;border:none;border-bottom:2px solid transparent;color:var(--tx3);font-size:0.85rem;font-weight:600;cursor:pointer;transition:all var(--tr);text-align:center;}
+.auth-tab.on{color:var(--accent);border-bottom-color:var(--accent);}
+.auth-pane{display:none;}
+.auth-pane.on{display:block;}
+.auth-divider{text-align:center;font-size:0.75rem;color:var(--tx3);margin:1rem 0;position:relative;}
+.auth-divider::before,.auth-divider::after{content:'';position:absolute;top:50%;width:calc(50% - 24px);height:1px;background:var(--bd);}
+.auth-divider::before{left:0;}
+.auth-divider::after{right:0;}
+.role-chip{display:inline-flex;align-items:center;gap:0.35rem;font-size:0.72rem;font-weight:600;padding:0.22rem 0.6rem;border-radius:999px;}
+.role-chip.user{background:rgba(59,130,246,0.15);color:var(--accent);border:1px solid var(--accent-b);}
+.role-chip.vendor{background:rgba(245,158,11,0.15);color:var(--gold);border:1px solid rgba(245,158,11,0.3);}
 .av{display:none;max-width:1240px;margin:0 auto;padding:1.75rem 1.5rem 5rem;}
 .av.open{display:block;}
 .vback{display:inline-flex;align-items:center;gap:0.38rem;font-size:0.8rem;font-weight:500;color:var(--tx2);background:none;border:none;cursor:pointer;transition:color var(--tr);margin-bottom:1.4rem;padding:0;}
@@ -227,16 +228,12 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
 .empty{text-align:center;padding:4rem 2rem;color:var(--tx3);}
 .empty svg{width:36px;height:36px;fill:var(--bg4);margin-bottom:0.9rem;}
 .empty h3{font-size:1.05rem;color:var(--tx2);margin-bottom:0.35rem;}
-.empty p{font-size:0.85rem;}
-
-/* ── REPORT ── */
 .rctrl{display:flex;gap:0.8rem;flex-wrap:wrap;align-items:flex-end;background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:1rem 1.2rem;margin-bottom:1.4rem;}
 .rf{display:flex;flex-direction:column;gap:0.28rem;}
 .rf label{font-size:0.72rem;font-weight:600;color:var(--tx2);}
-.rf select,.rf input{padding:0.47rem 0.7rem;background:var(--bg3);border:1px solid var(--bds);border-radius:var(--rsm);color:var(--tx);font-size:0.8rem;outline:none;}
+.rf select{padding:0.47rem 0.7rem;background:var(--bg3);border:1px solid var(--bds);border-radius:var(--rsm);color:var(--tx);font-size:0.8rem;outline:none;}
 .rf select option{background:var(--bg2);}
 .expbtn{padding:0.47rem 1rem;background:var(--accent);color:#fff;border:none;border-radius:var(--rsm);font-size:0.8rem;font-weight:600;cursor:pointer;transition:background var(--tr);display:flex;align-items:center;gap:0.35rem;}
-.expbtn svg{width:12px;height:12px;fill:#fff;}
 .expbtn:hover{background:var(--accent-h);}
 .sumrow{display:grid;grid-template-columns:repeat(4,1fr);gap:0.8rem;margin-bottom:1.4rem;}
 .scard{background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:1rem 1.15rem;}
@@ -251,15 +248,34 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
 .tbl td{padding:0.76rem 0.95rem;border-bottom:1px solid var(--bd);color:var(--tx);}
 .tbl tr:last-child td{border-bottom:none;}
 .tbl tbody tr:hover td{background:var(--bg3);}
-
-/* ── ADD MODAL HEAD ── */
 .amhd{background:var(--hdr);padding:1.6rem 1.6rem 1.3rem;border-radius:var(--rxl) var(--rxl) 0 0;position:relative;border-bottom:1px solid rgba(255,255,255,0.06);}
 .amt{font-family:'Instrument Serif',serif;font-size:1.4rem;color:#fff;margin-bottom:0.18rem;}
 .ams{font-size:0.8rem;color:rgba(255,255,255,0.38);}
-
-/* ── TOAST ── */
-#toast{position:fixed;bottom:1.6rem;right:1.6rem;z-index:999;background:var(--bg2);border:1px solid var(--bds);color:var(--tx);padding:0.7rem 1.1rem;border-radius:var(--r);font-size:0.83rem;font-weight:500;box-shadow:var(--shl);transform:translateY(130%);transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1);display:flex;align-items:center;gap:0.55rem;max-width:290px;}
-#toast.show{transform:translateY(0);}
+#ai-fab{position:fixed;bottom:1.75rem;right:1.75rem;width:52px;height:52px;border-radius:50%;background:linear-gradient(135deg,var(--accent),#7C3AED);border:none;cursor:pointer;box-shadow:0 8px 24px rgba(59,130,246,0.4);display:flex;align-items:center;justify-content:center;z-index:150;transition:transform 0.2s ease,box-shadow 0.2s ease;}
+#ai-fab:hover{transform:scale(1.08);box-shadow:0 12px 32px rgba(59,130,246,0.5);}
+#ai-fab svg{width:22px;height:22px;fill:#fff;}
+#ai-panel{position:fixed;bottom:5.5rem;right:1.75rem;width:360px;background:var(--bg2);border:1px solid var(--bds);border-radius:var(--rxl);box-shadow:0 24px 72px rgba(0,0,0,0.45);z-index:150;display:none;flex-direction:column;overflow:hidden;max-height:520px;}
+#ai-panel.open{display:flex;}
+.ai-head{background:linear-gradient(135deg,var(--accent),#7C3AED);padding:1rem 1.1rem;display:flex;align-items:center;justify-content:space-between;flex-shrink:0;}
+.ai-head-title{font-weight:700;font-size:0.88rem;color:#fff;}
+.ai-head-sub{font-size:0.72rem;color:rgba(255,255,255,0.65);margin-top:0.1rem;}
+.ai-close{background:rgba(255,255,255,0.15);border:none;color:#fff;width:24px;height:24px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:0.8rem;transition:background var(--tr);}
+.ai-close:hover{background:rgba(255,255,255,0.3);}
+.ai-msgs{flex:1;overflow-y:auto;padding:1rem;display:flex;flex-direction:column;gap:0.75rem;}
+.ai-msg{max-width:85%;padding:0.65rem 0.85rem;border-radius:12px;font-size:0.83rem;line-height:1.55;}
+.ai-msg.bot{background:var(--bg3);color:var(--tx);border-bottom-left-radius:3px;align-self:flex-start;}
+.ai-msg.user{background:var(--accent);color:#fff;border-bottom-right-radius:3px;align-self:flex-end;}
+.ai-msg.loading{color:var(--tx3);}
+.ai-foot{padding:0.75rem;border-top:1px solid var(--bd);display:flex;gap:0.5rem;flex-shrink:0;}
+.ai-input{flex:1;padding:0.55rem 0.8rem;background:var(--bg3);border:1px solid var(--bds);border-radius:var(--rsm);color:var(--tx);font-size:0.83rem;outline:none;transition:border-color var(--tr);}
+.ai-input:focus{border-color:var(--accent);}
+.ai-send{padding:0.55rem 0.9rem;background:var(--accent);color:#fff;border:none;border-radius:var(--rsm);font-size:0.8rem;font-weight:600;cursor:pointer;transition:background var(--tr);}
+.ai-send:hover{background:var(--accent-h);}
+.ai-suggestions{display:flex;flex-wrap:wrap;gap:0.4rem;padding:0 1rem 0.75rem;}
+.ai-sug{font-size:0.72rem;padding:0.28rem 0.65rem;background:var(--bg3);border:1px solid var(--bds);color:var(--tx2);border-radius:999px;cursor:pointer;transition:all var(--tr);}
+.ai-sug:hover{background:var(--accent-dim);color:var(--accent);border-color:var(--accent-b);}
+#toast{position:fixed;bottom:1.6rem;left:50%;transform:translateX(-50%) translateY(130%);z-index:999;background:var(--bg2);border:1px solid var(--bds);color:var(--tx);padding:0.7rem 1.25rem;border-radius:var(--r);font-size:0.83rem;font-weight:500;box-shadow:var(--shl);transition:transform 0.28s cubic-bezier(0.34,1.56,0.64,1);display:flex;align-items:center;gap:0.55rem;white-space:nowrap;}
+#toast.show{transform:translateX(-50%) translateY(0);}
 #toast.g{border-left:3px solid var(--green);}
 #toast.o{border-left:3px solid var(--gold);}
 #toast.r{border-left:3px solid var(--red);}
@@ -269,15 +285,881 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
 #toast.r .tdot{background:var(--red);}
 #nores{display:none;}
 #nores.show{display:block;}
-@media(max-width:860px){#shell{grid-template-columns:1fr;}#sb{position:static;}.sumrow{grid-template-columns:repeat(2,1fr);}}
-@media(max-width:560px){.hero-h1{font-size:1.85rem;}.hero-sb{flex-direction:column;}.hero-sb select{border-left:none;border-top:1px solid rgba(255,255,255,0.07);}.hi{gap:0.65rem;padding:0 0.9rem;}.loc{display:none;}}
-[data-theme="light"] .hsearch input{color:#fff;}
+.char-count{font-size:0.68rem;color:var(--tx3);text-align:right;margin-top:0.22rem;}
+.input-hint{font-size:0.7rem;color:var(--tx3);margin-top:0.22rem;}
+@media(max-width:860px){#shell{grid-template-columns:1fr;}#sb{position:static;}.sumrow{grid-template-columns:repeat(2,1fr);}#ai-panel{width:calc(100vw - 2rem);right:1rem;}}
+@media(max-width:560px){.hero-h1{font-size:1.85rem;}.hero-sb{flex-direction:column;}.hero-sb select{border-left:none;border-top:1px solid rgba(255,255,255,0.07);}.hi{gap:0.65rem;padding:0 0.9rem;}.loc{display:none;}#ai-fab{bottom:1rem;right:1rem;}}
+[data-theme="light"] .hsearch input,[data-theme="light"] .hero-sb input,[data-theme="light"] .hero-sb select{color:#fff;}
 [data-theme="light"] .cchip{background:rgba(0,0,0,0.55);}
 [data-theme="light"] .bkbtn{background:rgba(0,0,0,0.5);}
 </style>
+
+<!-- Firebase SDK v10 (modular, loaded via CDN) -->
+<script type="module">
+/* ════════════════════════════════════════════════════════
+   ██████  FIREBASE CONFIG — PASTE YOURS HERE  ██████
+   
+   Steps:
+   1. Go to console.firebase.google.com
+   2. Your Project → Project Settings → Your Apps → Web App
+   3. Copy the firebaseConfig object and replace below
+   4. In Firebase Console: Authentication → Sign-in method → Enable Google
+   5. In Firebase Console: Firestore Database → Create database (test mode)
+════════════════════════════════════════════════════════ */
+import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, signInWithPopup, signOut, onAuthStateChanged,
+         GoogleAuthProvider, createUserWithEmailAndPassword,
+         signInWithEmailAndPassword }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, collection, doc, addDoc, setDoc, getDoc,
+         getDocs, updateDoc, deleteDoc, onSnapshot, query,
+         where, orderBy, serverTimestamp, limit }
+  from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+// ── PASTE YOUR FIREBASE CONFIG HERE ──────────────────────
+const firebaseConfig = {
+  apiKey:            "AIzaSyB42gMLT9W-46B4wJE-oAsEB7MxsEgU6sw",
+  authDomain:        "localpulse-b4f3d.firebaseapp.com",
+  projectId:         "localpulse-b4f3d",
+  storageBucket:     "localpulse-b4f3d.firebasestorage.app",
+  messagingSenderId: "828978806720",
+  appId:             "1:828978806720:web:be9a1eae0e55cd36e1d225"
+};
+// ─────────────────────────────────────────────────────────
+
+// ── ADMIN CONFIG ──────────────────────────────────────────
+// Change this to your Google account email to make yourself admin
+const ADMIN_EMAIL = "shrinithi.shaurya@gmail.com";
+
+// Vendor approval codes — vendors enter one of these to get vendor status
+// You can change these to whatever you want
+const VENDOR_CODES = ["TEMPE2026", "LOCALPULSE", "FBLA2026"];
+// ─────────────────────────────────────────────────────────
+
+// Initialize Firebase services
+const app  = initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db   = getFirestore(app);
+const googleProvider = new GoogleAuthProvider();
+
+/* ════════════════════════════════════════════════════════
+   APP STATE — central state object
+════════════════════════════════════════════════════════ */
+const S = {
+  user:      null,   // Firebase auth user object
+  userDoc:   null,   // Firestore user profile { role, displayName, ... }
+  businesses:[],     // Array of business objects from Firestore
+  bk:        [],     // Bookmarked business IDs array
+  cat:       '',     // Active category filter
+  sort:      'rating',
+  q:         '',
+  cid:       null,   // Current business ID in modal
+  stars:     0,
+  capDone:   false,
+  acapDone:  false,
+  rateLimit: {},     // { userId_bizId: lastReviewTimestamp } for rate limiting
+};
+
+/* ════════════════════════════════════════════════════════
+   SEED DATA — Pre-loaded Tempe businesses
+   Written to Firestore on first run if collection is empty
+════════════════════════════════════════════════════════ */
+const SEED_BUSINESSES = [
+  {name:"House of Tricks",cat:"Food & Drink",hood:"Mill Avenue District",addr:"114 E 7th St, Tempe AZ 85281",desc:"A Tempe institution since 1987, set in charming 1920s bungalows. New American seasonal cuisine with a legendary patio.",img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80",rating:4.7,rc:3,deal:"Weeknight 2-entree dinner: complimentary dessert",dc:"TRICKS2",verified:true,isNew:false,revs:[{who:"Priya M.",r:5,txt:"Magical patio dining. The duck was incredible.",dt:"Feb 2026"},{who:"James T.",r:4,txt:"A Tempe institution for good reason.",dt:"Jan 2026"},{who:"Sofia R.",r:5,txt:"Took my parents here — bruschetta was a standout.",dt:"Mar 2026"}]},
+  {name:"Changing Hands Bookstore",cat:"Retail",hood:"Mill Avenue District",addr:"6428 S McClintock Dr, Tempe AZ 85283",desc:"Arizona's beloved independent bookstore with First Draft beer and coffee bar and a packed events calendar.",img:"https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=600&q=80",rating:4.9,rc:4,deal:"10% off any purchase over $30 — mention LocalPulse",dc:"LPBOOKS10",verified:true,isNew:false,revs:[{who:"Ananya P.",r:5,txt:"My favorite place in all of Tempe.",dt:"Feb 2026"},{who:"Kevin L.",r:5,txt:"Incredible curation and genuine community feel.",dt:"Jan 2026"},{who:"Mei C.",r:4,txt:"Great selection and warm atmosphere.",dt:"Mar 2026"},{who:"Daniel F.",r:5,txt:"Nothing beats browsing here Sunday morning.",dt:"Dec 2025"}]},
+  {name:"The Boulders on Broadway",cat:"Food & Drink",hood:"South Tempe",addr:"530 W Broadway Rd, Tempe AZ 85282",desc:"A true Tempe dive bar with an epic outdoor beer garden, live music nights, and legendary buffalo wings.",img:"https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=600&q=80",rating:4.4,rc:2,deal:"Happy Hour 3–6pm daily — $3 drafts",dc:"BOULDERHHOUR",verified:true,isNew:false,revs:[{who:"Tyler W.",r:4,txt:"Best beer garden in Tempe. Wings are great.",dt:"Feb 2026"},{who:"Riya S.",r:5,txt:"Such a genuine local spot.",dt:"Jan 2026"}]},
+  {name:"Songbird Coffee & Tea House",cat:"Food & Drink",hood:"ASU / University",addr:"1401 E University Dr, Tempe AZ 85281",desc:"A cozy, study-friendly indie café near ASU known for specialty teas, seasonal lattes, and great Wi-Fi.",img:"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&q=80",rating:4.8,rc:3,deal:"Free size upgrade with any student ID",dc:"SONGBIRD",verified:true,isNew:false,revs:[{who:"Ayaan K.",r:5,txt:"My go-to study spot. The horchata latte is divine.",dt:"Mar 2026"},{who:"Lisa V.",r:5,txt:"Best coffee near ASU.",dt:"Feb 2026"},{who:"Marcus T.",r:4,txt:"Solid café. The pour-over is excellent.",dt:"Jan 2026"}]},
+  {name:"Tempe Bicycle",cat:"Services",hood:"ASU / University",addr:"330 W University Dr, Tempe AZ 85281",desc:"Tempe's go-to bike shop since 1979. Expert repairs, rentals, and wide selection for every rider.",img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",rating:4.6,rc:2,deal:"Free tune-up with any bicycle purchase",dc:"TBIKE2026",verified:true,isNew:false,revs:[{who:"Chris N.",r:5,txt:"Fixed my flat in 20 minutes. These guys genuinely care.",dt:"Feb 2026"},{who:"Sara H.",r:4,txt:"Friendly, knowledgeable staff.",dt:"Jan 2026"}]},
+  {name:"Tempe Farmers Market",cat:"Retail",hood:"McClintock / Rural",addr:"2000 E Rio Salado Pkwy, Tempe AZ 85281",desc:"Weekly outdoor market with local Arizona farmers, artisan vendors, and live entertainment. Saturdays 8am–noon.",img:"https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=600&q=80",rating:4.5,rc:2,deal:"Free canvas tote with $25+ purchase — Saturdays",dc:"MARKET25",verified:true,isNew:false,revs:[{who:"Fatima A.",r:5,txt:"Love starting Saturday here.",dt:"Mar 2026"},{who:"Greg P.",r:4,txt:"Feels like the community showing up for itself.",dt:"Feb 2026"}]},
+  {name:"Francine Restaurant",cat:"Food & Drink",hood:"Downtown Tempe",addr:"1840 E Camelback Rd, Phoenix (serves Tempe)",desc:"French-inspired American bistro with a stunning patio, fresh seasonal ingredients, and legendary brunch.",img:"https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&q=80",rating:4.8,rc:2,deal:"Sunday brunch: bottomless mimosas with any entrée 10am–2pm",dc:"FRANCINEBRUNCH",verified:true,isNew:false,revs:[{who:"Natalie O.",r:5,txt:"Hands down one of the best brunches in the Valley.",dt:"Mar 2026"},{who:"Ethan J.",r:5,txt:"Incredible French-inspired menu, excellent natural wine.",dt:"Jan 2026"}]},
+  {name:"Enduro Bike & Fitness",cat:"Health & Wellness",hood:"South Tempe",addr:"1540 E Southern Ave, Tempe AZ 85282",desc:"Tempe's premier cycling studio offering spin classes, personal training, and professional bike fitting.",img:"https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80",rating:4.3,rc:2,deal:"First spin class FREE for new members",dc:"ENDURO1",verified:true,isNew:true,revs:[{who:"Rachel B.",r:4,txt:"Great instructors. Spin classes are intense in the best way.",dt:"Feb 2026"},{who:"Omar S.",r:5,txt:"Bike fitting is worth every penny.",dt:"Jan 2026"}]},
+  {name:"Tempe Art Glass",cat:"Arts & Culture",hood:"Downtown Tempe",addr:"615 S College Ave, Tempe AZ 85281",desc:"A hidden gem offering glass-blowing classes, custom art commissions, and handmade gifts. Drop-in weekends.",img:"https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&q=80",rating:4.9,rc:3,deal:"15% off any class — mention LocalPulse",dc:"GLASS15",verified:true,isNew:true,revs:[{who:"Isabelle M.",r:5,txt:"Most unique experience. Instructors so patient.",dt:"Mar 2026"},{who:"Rajan V.",r:5,txt:"Bought a custom piece — craftsmanship exceptional.",dt:"Feb 2026"},{who:"Hannah W.",r:5,txt:"Weekend workshops are fantastic for date night.",dt:"Jan 2026"}]},
+  {name:"Gentle Strength Co-op",cat:"Retail",hood:"ASU / University",addr:"234 W University Dr, Tempe AZ 85281",desc:"Tempe's original natural food co-op since 1976. Organic produce, bulk foods, and a beloved deli. Community-owned.",img:"https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=80",rating:4.6,rc:2,deal:"Membership: 10% off all purchases permanently",dc:"COOP2026",verified:true,isNew:false,revs:[{who:"Priya L.",r:5,txt:"So glad this place exists.",dt:"Feb 2026"},{who:"Tom H.",r:4,txt:"Quality and ethics are unmatched.",dt:"Jan 2026"}]},
+  {name:"Arizona Hair Design",cat:"Health & Wellness",hood:"Kyrene Corridor",addr:"4955 S Alma School Rd, Chandler (serves S. Tempe)",desc:"Top-rated salon specializing in color, cuts, and extensions — consultations that genuinely listen.",img:"https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&q=80",rating:4.7,rc:2,deal:"New client: 20% off your first visit",dc:"AZNEWCLIENT",verified:true,isNew:false,revs:[{who:"Leila N.",r:5,txt:"Best salon experience in years.",dt:"Mar 2026"},{who:"Chloe K.",r:4,txt:"Clean space, friendly team, great result.",dt:"Feb 2026"}]},
+  {name:"Desert Edge Brewery",cat:"Food & Drink",hood:"Downtown Tempe",addr:"1005 S Rural Rd, Tempe AZ 85281",desc:"Award-winning craft brewery with rotating Arizona-brewed taps and one of the best patios in Tempe.",img:"https://images.unsplash.com/photo-1559526324-593bc073d938?w=600&q=80",rating:4.5,rc:2,deal:"Pint + appetizer combo $14 — Tues & Wed",dc:"DEDGECOMBO",verified:true,isNew:false,revs:[{who:"Nick A.",r:5,txt:"Saguaro Wheat is my go-to AZ beer.",dt:"Feb 2026"},{who:"Ana R.",r:4,txt:"Solid brewery. The flight is a great way to sample.",dt:"Jan 2026"}]},
+  {name:"Sun Devil Tutoring Center",cat:"Education",hood:"ASU / University",addr:"1151 S Forest Ave, Tempe AZ 85281",desc:"Locally-run tutoring with one-on-one STEM, writing, and test prep sessions for ASU students and K-12.",img:"https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&q=80",rating:4.4,rc:2,deal:"First session free for new students",dc:"SDSTUTOR1",verified:true,isNew:true,revs:[{who:"Riya C.",r:4,txt:"Really helped me pass orgo.",dt:"Mar 2026"},{who:"Mark S.",r:5,txt:"Daughter went from failing to B+ in one semester.",dt:"Jan 2026"}]},
+  {name:"Myke's Woodfire BBQ",cat:"Food & Drink",hood:"South Tempe",addr:"811 E Southern Ave, Tempe AZ 85282",desc:"No-frills, all-flavor Tempe BBQ with slow-smoked meats and homemade sides. Get there before 6pm.",img:"https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=600&q=80",rating:4.8,rc:3,deal:"Family platter: $5 off on weeknights",dc:"MYKEFAM5",verified:true,isNew:false,revs:[{who:"Jerome T.",r:5,txt:"Best BBQ in the East Valley. Brisket perfectly smoked.",dt:"Mar 2026"},{who:"Kayla B.",r:5,txt:"Pulled pork with homemade slaw is incredible.",dt:"Feb 2026"},{who:"Shawn D.",r:4,txt:"Solid BBQ at honest prices.",dt:"Jan 2026"}]},
+  {name:"Tempe Yoga Collective",cat:"Health & Wellness",hood:"Mill Avenue District",addr:"501 S Mill Ave, Tempe AZ 85281",desc:"Community-focused studio with daily vinyasa, yin, and restorative classes. Pay-what-you-can Sundays.",img:"https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=600&q=80",rating:4.7,rc:2,deal:"Intro week: unlimited classes for $15",dc:"YOGAINTRO",verified:true,isNew:false,revs:[{who:"Alicia P.",r:5,txt:"Sunday community class is a gift.",dt:"Mar 2026"},{who:"Derek M.",r:4,txt:"Great variety of classes. Yin instructor especially good.",dt:"Feb 2026"}]},
+];
+
+/* ════════════════════════════════════════════════════════
+   PROFANITY FILTER — Semantic input validation
+   Blocks offensive content from reviews and listings
+════════════════════════════════════════════════════════ */
+const BLOCKED_WORDS = ['spam','scam','fake','fraud','idiot','stupid','hate','terrible','worst','awful','trash','garbage','crap'];
+
+function containsProfanity(text) {
+  const lower = text.toLowerCase();
+  return BLOCKED_WORDS.some(w => lower.includes(w));
+}
+
+/* ════════════════════════════════════════════════════════
+   RATE LIMITING — Security
+   Prevents users from submitting multiple reviews
+   for the same business within 24 hours
+════════════════════════════════════════════════════════ */
+function checkRateLimit(userId, bizId) {
+  const key = `${userId}_${bizId}`;
+  const last = S.rateLimit[key];
+  if (!last) return true; // allowed
+  const hoursAgo = (Date.now() - last) / 1000 / 3600;
+  return hoursAgo >= 24; // must wait 24h between reviews
+}
+function setRateLimit(userId, bizId) {
+  S.rateLimit[`${userId}_${bizId}`] = Date.now();
+}
+
+/* ════════════════════════════════════════════════════════
+   FIRESTORE — Load businesses
+════════════════════════════════════════════════════════ */
+async function loadBusinesses() {
+  try {
+    const snap = await getDocs(collection(db, 'businesses'));
+
+    if (snap.empty) {
+      // First run: seed the database with our Tempe businesses
+      console.log('Seeding Firestore with businesses…');
+      for (const biz of SEED_BUSINESSES) {
+        await addDoc(collection(db, 'businesses'), {
+          ...biz,
+          createdAt: serverTimestamp()
+        });
+      }
+      // Reload after seeding
+      const snap2 = await getDocs(collection(db, 'businesses'));
+      S.businesses = snap2.docs.map(d => ({ id: d.id, ...d.data() }));
+    } else {
+      S.businesses = snap.docs.map(d => ({ id: d.id, ...d.data() }));
+    }
+
+    renderCats();
+    renderDeals();
+    renderGrid();
+    document.getElementById('sbiz').textContent = S.businesses.length;
+  } catch (err) {
+    console.error('Firestore load error:', err);
+    // Fallback to seed data locally if Firebase not configured
+    S.businesses = SEED_BUSINESSES.map((b, i) => ({ id: String(i + 1), ...b }));
+    renderCats(); renderDeals(); renderGrid();
+    document.getElementById('sbiz').textContent = S.businesses.length;
+  }
+}
+
+/* ════════════════════════════════════════════════════════
+   AUTH — Firebase Authentication
+════════════════════════════════════════════════════════ */
+
+// Listen for auth state changes (fires on login/logout/page reload)
+onAuthStateChanged(auth, async (firebaseUser) => {
+  if (firebaseUser) {
+    S.user = firebaseUser;
+
+    // Load or create user profile in Firestore
+    const userRef = doc(db, 'users', firebaseUser.uid);
+    const userSnap = await getDoc(userRef);
+
+    if (!userSnap.exists()) {
+      // New user — create profile with default 'user' role
+      const profile = {
+        displayName: firebaseUser.displayName || firebaseUser.email.split('@')[0],
+        email: firebaseUser.email,
+        role: firebaseUser.email === ADMIN_EMAIL ? 'admin' : 'user',
+        photoURL: firebaseUser.photoURL || null,
+        createdAt: serverTimestamp()
+      };
+      await setDoc(userRef, profile);
+      S.userDoc = profile;
+    } else {
+      S.userDoc = userSnap.data();
+      // Auto-promote admin email
+      if (firebaseUser.email === ADMIN_EMAIL && S.userDoc.role !== 'admin') {
+        await updateDoc(userRef, { role: 'admin' });
+        S.userDoc.role = 'admin';
+      }
+    }
+
+    updateAuthUI();
+    closeModal('auth-ovl');
+    toast(`Welcome, ${S.userDoc.displayName}!`, 'g');
+
+    // Load bookmarks from Firestore for this user
+    loadBookmarks();
+
+  } else {
+    // Logged out
+    S.user = null;
+    S.userDoc = null;
+    S.bk = [];
+    updateAuthUI();
+    syncBdg();
+  }
+});
+
+// Google Sign-In
+window.signInWithGoogle = async function() {
+  try {
+    await signInWithPopup(auth, googleProvider);
+    // onAuthStateChanged handles the rest
+  } catch (err) {
+    if (err.code !== 'auth/popup-closed-by-user') {
+      toast('Sign-in failed. Please try again.', 'r');
+    }
+  }
+};
+
+// Email/Password Sign-In
+window.signInWithEmail = async function() {
+  const email = document.getElementById('ep-email').value.trim();
+  const pass  = document.getElementById('ep-pass').value;
+  const isReg = document.getElementById('ep-register').checked;
+
+  // Syntactical validation
+  if (!validateEmail(email)) {
+    showFieldErr('ep-email-err', 'Please enter a valid email address.');
+    return;
+  }
+  if (pass.length < 6) {
+    showFieldErr('ep-pass-err', 'Password must be at least 6 characters.');
+    return;
+  }
+
+  try {
+    if (isReg) {
+      await createUserWithEmailAndPassword(auth, email, pass);
+    } else {
+      await signInWithEmailAndPassword(auth, email, pass);
+    }
+  } catch (err) {
+    const msgs = {
+      'auth/user-not-found': 'No account found. Check "Register" to create one.',
+      'auth/wrong-password': 'Incorrect password.',
+      'auth/email-already-in-use': 'Email already registered. Try signing in.',
+      'auth/invalid-email': 'Invalid email address.',
+    };
+    toast(msgs[err.code] || 'Auth error: ' + err.message, 'r');
+  }
+};
+
+// Logout
+window.doLogout = async function() {
+  await signOut(auth);
+  toast('Logged out', 'g');
+};
+
+// Upgrade to vendor with approval code
+window.upgradeToVendor = async function() {
+  const code = document.getElementById('vendor-code').value.trim().toUpperCase();
+  const bizName = document.getElementById('vendor-bizname').value.trim();
+
+  // Syntactical: fields required
+  if (!code) { showFieldErr('vc-code-err', 'Please enter your vendor code.'); return; }
+  if (bizName.length < 2) { showFieldErr('vc-biz-err', 'Please enter your business name.'); return; }
+
+  // Semantic: code must be in approved list
+  if (!VENDOR_CODES.includes(code)) {
+    showFieldErr('vc-code-err', 'Invalid vendor code. Contact LocalPulse admin to request access.');
+    return;
+  }
+
+  // Valid — upgrade role in Firestore
+  await updateDoc(doc(db, 'users', S.user.uid), {
+    role: 'vendor',
+    bizName,
+    vendorApprovedAt: serverTimestamp()
+  });
+  S.userDoc.role = 'vendor';
+  S.userDoc.bizName = bizName;
+  updateAuthUI();
+  closeModal('auth-ovl');
+  toast(`Vendor access granted! You can now list ${bizName}.`, 'o');
+};
+
+/* ════════════════════════════════════════════════════════
+   BOOKMARKS — Firestore persisted per user
+════════════════════════════════════════════════════════ */
+async function loadBookmarks() {
+  if (!S.user) return;
+  try {
+    const snap = await getDoc(doc(db, 'bookmarks', S.user.uid));
+    if (snap.exists()) {
+      S.bk = snap.data().ids || [];
+    } else {
+      S.bk = [];
+    }
+    syncBdg();
+    renderGrid();
+  } catch { S.bk = []; }
+}
+
+window.togBk = async function(e, id) {
+  e.stopPropagation();
+  if (!S.user) { toast('Sign in to save businesses', 'o'); openModal('auth-ovl'); return; }
+
+  const i = S.bk.indexOf(id);
+  if (i === -1) { S.bk.push(id); toast('Business saved', 'o'); }
+  else { S.bk.splice(i, 1); toast('Removed from saved', 'g'); }
+
+  // Persist to Firestore
+  try {
+    await setDoc(doc(db, 'bookmarks', S.user.uid), { ids: S.bk });
+  } catch { /* fail silently */ }
+
+  syncBdg();
+  renderGrid();
+  if (document.getElementById('bkv').classList.contains('open')) renderBk();
+};
+
+function syncBdg() {
+  const b = document.getElementById('bkbdg');
+  b.textContent = S.bk.length;
+  b.style.display = S.bk.length ? 'flex' : 'none';
+}
+
+/* ════════════════════════════════════════════════════════
+   SUBMIT BUSINESS — Firestore write (vendor only)
+════════════════════════════════════════════════════════ */
+window.submitBiz = async function() {
+  // Security: double-check vendor role server-side logic
+  if (!S.user || (S.userDoc?.role !== 'vendor' && S.userDoc?.role !== 'admin')) {
+    toast('Vendor access required to list a business.', 'r');
+    return;
+  }
+
+  const n   = document.getElementById('an').value.trim();
+  const c   = document.getElementById('ac').value;
+  const h   = document.getElementById('ah').value;
+  const a   = document.getElementById('aa').value.trim();
+  const d   = document.getElementById('ad').value.trim();
+  const dl  = document.getElementById('adl').value.trim();
+  let ok = true;
+  const sh = (id, msg) => {
+    const el = document.getElementById(id);
+    el.textContent = msg;
+    el.classList.toggle('show', !!msg);
+    if (msg) ok = false;
+  };
+
+  // Syntactical validation
+  if (n.length < 2)  sh('aen', 'Business name must be at least 2 characters.'); else sh('aen', '');
+  if (!c)             sh('aec', 'Please select a category.'); else sh('aec', '');
+  if (!h)             sh('aeh', 'Please select a neighborhood.'); else sh('aeh', '');
+  if (d.length < 20) sh('aed', 'Description must be at least 20 characters.'); else sh('aed', '');
+
+  // Semantic: address must start with street number
+  if (!/^\d/.test(a) || a.length < 8)
+    sh('aea', 'Please enter a valid street address (e.g. 123 Mill Ave, Tempe AZ).');
+  else sh('aea', '');
+
+  // Semantic: profanity check on description
+  if (containsProfanity(d)) {
+    sh('aed', 'Description contains inappropriate content. Please revise.');
+    ok = false;
+  }
+
+  if (!S.acapDone) { document.getElementById('aecp').classList.add('show'); ok = false; }
+  else document.getElementById('aecp').classList.remove('show');
+
+  if (!ok) return;
+
+  // Show loading state
+  const btn = document.querySelector('#aovl .subbtn');
+  btn.textContent = 'Submitting…';
+  btn.disabled = true;
+
+  const IMGS = {
+    'Food & Drink':'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80',
+    'Retail':'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=600&q=80',
+    'Health & Wellness':'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=600&q=80',
+    'Services':'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80',
+    'Arts & Culture':'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&q=80',
+    'Education':'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&q=80',
+  };
+
+  try {
+    const newBiz = {
+      name:n, cat:c, hood:h, addr:a, desc:d,
+      img: IMGS[c] || IMGS.Retail,
+      rating:0, rc:0, revs:[],
+      deal: dl || null,
+      dc: dl ? n.toUpperCase().replace(/\s+/g,'').slice(0,8)+'10' : null,
+      verified:false, isNew:true,
+      vendorId: S.user.uid,
+      vendorName: S.userDoc.bizName || S.userDoc.displayName,
+      createdAt: serverTimestamp()
+    };
+
+    const ref = await addDoc(collection(db, 'businesses'), newBiz);
+    S.businesses.unshift({ id: ref.id, ...newBiz });
+    renderCats(); renderDeals(); renderGrid();
+    closeModal('aovl');
+    toast(`"${n}" listed successfully!`, 'o');
+
+    // Reset form
+    ['an','aa','ad','adl'].forEach(id => document.getElementById(id).value = '');
+    ['ac','ah'].forEach(id => document.getElementById(id).value = '');
+    S.acapDone = false;
+    document.getElementById('acap').classList.remove('on');
+  } catch (err) {
+    toast('Error saving business. Check your connection.', 'r');
+  } finally {
+    btn.textContent = 'Submit Listing';
+    btn.disabled = false;
+  }
+};
+
+/* ════════════════════════════════════════════════════════
+   SUBMIT REVIEW — Firestore write with rate limiting
+════════════════════════════════════════════════════════ */
+window.submitRev = async function() {
+  if (!S.user) { toast('Please sign in to write a review.', 'o'); return; }
+
+  const text = (document.getElementById('rt') || {}).value || '';
+  let ok = true;
+  const sh = (id, msg) => {
+    const el = document.getElementById(id);
+    if (!el) return;
+    el.textContent = msg || '';
+    el.classList.toggle('show', !!msg);
+    if (msg) ok = false;
+  };
+
+  if (S.stars === 0) sh('es', 'Please select a rating.');
+  else sh('es', '');
+
+  const cleanText = text.trim();
+
+  // Semantic: minimum length + not all same character (spam check)
+  if (cleanText.length < 10) { sh('et', 'Please write at least 10 characters.'); }
+  else if (new Set(cleanText.split('')).size < 4) { sh('et', 'Review looks like spam. Please write a genuine review.'); }
+  // Semantic: profanity filter
+  else if (containsProfanity(cleanText)) { sh('et', 'Review contains inappropriate content.'); }
+  else sh('et', '');
+
+  if (!S.capDone) { document.getElementById('ec').classList.add('show'); ok = false; }
+  else document.getElementById('ec').classList.remove('show');
+
+  if (!ok) return;
+
+  // Rate limit: 1 review per business per 24 hours
+  if (!checkRateLimit(S.user.uid, S.cid)) {
+    toast('You can only review each business once per 24 hours.', 'r');
+    return;
+  }
+
+  const b = S.businesses.find(x => x.id === S.cid);
+  const newReview = {
+    who: S.user.displayName || S.userDoc?.displayName || 'LocalPulse User',
+    r: S.stars,
+    txt: cleanText,
+    dt: new Date().toLocaleDateString('en-US', { month:'short', year:'numeric' }),
+    uid: S.user.uid
+  };
+
+  const updatedRevs = [newReview, ...(b.revs || [])];
+  const newRc = updatedRevs.length;
+  const newRating = parseFloat((updatedRevs.reduce((s, r) => s + r.r, 0) / newRc).toFixed(1));
+
+  try {
+    // Update in Firestore
+    await updateDoc(doc(db, 'businesses', S.cid), {
+      revs: updatedRevs,
+      rc: newRc,
+      rating: newRating
+    });
+
+    // Update local state
+    b.revs = updatedRevs;
+    b.rc = newRc;
+    b.rating = newRating;
+
+    setRateLimit(S.user.uid, S.cid);
+    renderMRevs(b);
+
+    document.getElementById('mrsum').innerHTML = `
+      <div class="rbig">${b.rating.toFixed(1)}</div>
+      <div><div class="srow">${starsH(b.rating, 14)}</div>
+      <div class="rsub" style="margin-top:0.2rem;">${b.rc} reviews</div></div>`;
+
+    if (document.getElementById('rt')) document.getElementById('rt').value = '';
+    document.querySelectorAll('.sps').forEach(s => s.classList.remove('on'));
+    S.stars = 0; S.capDone = false;
+    if (document.getElementById('cap')) document.getElementById('cap').classList.remove('on');
+    renderGrid();
+    toast('Review submitted — thank you!', 'g');
+  } catch (err) {
+    toast('Error saving review. Check your connection.', 'r');
+  }
+};
+
+/* ════════════════════════════════════════════════════════
+   ADMIN PANEL — Delete listings, approve vendors
+════════════════════════════════════════════════════════ */
+window.deleteBusiness = async function(bizId, bizName) {
+  if (S.userDoc?.role !== 'admin') return;
+  if (!confirm(`Delete "${bizName}"? This cannot be undone.`)) return;
+  try {
+    await deleteDoc(doc(db, 'businesses', bizId));
+    S.businesses = S.businesses.filter(b => b.id !== bizId);
+    renderGrid();
+    renderAdminPanel();
+    toast(`"${bizName}" deleted.`, 'r');
+  } catch (err) {
+    toast('Error deleting business.', 'r');
+  }
+};
+
+window.verifyBusiness = async function(bizId) {
+  if (S.userDoc?.role !== 'admin') return;
+  try {
+    await updateDoc(doc(db, 'businesses', bizId), { verified: true });
+    const b = S.businesses.find(x => x.id === bizId);
+    if (b) { b.verified = true; renderGrid(); }
+    toast('Business verified!', 'g');
+    renderAdminPanel();
+  } catch (err) {
+    toast('Error verifying business.', 'r');
+  }
+};
+
+function renderAdminPanel() {
+  if (S.userDoc?.role !== 'admin') return;
+  const unverified = S.businesses.filter(b => !b.verified);
+  document.getElementById('admin-count').textContent = unverified.length;
+  document.getElementById('admin-list').innerHTML = unverified.length === 0
+    ? '<div style="color:var(--tx3);font-size:0.83rem;padding:0.5rem 0;">All listings are verified.</div>'
+    : unverified.map(b => `
+      <div style="display:flex;align-items:center;gap:0.75rem;padding:0.65rem 0;border-bottom:1px solid var(--bd);">
+        <div style="flex:1;min-width:0;">
+          <div style="font-size:0.83rem;font-weight:600;color:var(--tx);">${b.name}</div>
+          <div style="font-size:0.72rem;color:var(--tx3);">${b.cat} · ${b.hood}</div>
+        </div>
+        <button onclick="verifyBusiness('${b.id}')" style="padding:0.28rem 0.65rem;background:var(--green);color:#fff;border:none;border-radius:var(--rsm);font-size:0.72rem;font-weight:600;cursor:pointer;">Verify</button>
+        <button onclick="deleteBusiness('${b.id}','${b.name.replace(/'/g, '')}')" style="padding:0.28rem 0.65rem;background:var(--red);color:#fff;border:none;border-radius:var(--rsm);font-size:0.72rem;font-weight:600;cursor:pointer;">Delete</button>
+      </div>`).join('');
+}
+
+/* ════════════════════════════════════════════════════════
+   AI ASSISTANT — Claude API
+════════════════════════════════════════════════════════ */
+let aiOpen = false;
+let aiHistory = [];
+
+window.toggleAI = function() {
+  aiOpen = !aiOpen;
+  document.getElementById('ai-panel').classList.toggle('open', aiOpen);
+  if (aiOpen) document.getElementById('ai-q').focus();
+};
+
+window.aiSuggest = function(el) {
+  document.getElementById('ai-q').value = el.textContent;
+  document.getElementById('ai-sugs').style.display = 'none';
+  sendAI();
+};
+
+window.sendAI = async function() {
+  const input = document.getElementById('ai-q');
+  const q = input.value.trim();
+  if (!q) return;
+  addAIMsg(q, 'user');
+  input.value = '';
+  const loadId = 'load-' + Date.now();
+  addAIMsg('Thinking…', 'bot loading', loadId);
+
+  const bizContext = S.businesses.map(b =>
+    `- ${b.name} (${b.cat}, ${b.hood}): ${b.desc} Rating: ${b.rating}/5 (${b.rc} reviews).${b.deal ? ' Deal: ' + b.deal : ''}`
+  ).join('\n');
+
+  const systemPrompt = `You are a helpful AI assistant for LocalPulse, a local business directory for Tempe, Arizona. Help users find the best local businesses. Be conversational and specific — always reference actual businesses from the directory. Keep responses to 2-4 sentences.\n\nCurrent businesses:\n${bizContext}`;
+
+  aiHistory.push({ role: 'user', content: q });
+
+  try {
+    const res = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-20250514',
+        max_tokens: 1000,
+        system: systemPrompt,
+        messages: aiHistory
+      })
+    });
+    const data = await res.json();
+    document.getElementById(loadId)?.remove();
+    if (data.content?.[0]) {
+      const reply = data.content[0].text;
+      aiHistory.push({ role: 'assistant', content: reply });
+      addAIMsg(reply, 'bot');
+    } else {
+      addAIMsg(getFallback(q), 'bot');
+    }
+  } catch {
+    document.getElementById(loadId)?.remove();
+    addAIMsg(getFallback(q), 'bot');
+  }
+};
+
+function addAIMsg(text, cls, id = '') {
+  const msgs = document.getElementById('ai-msgs');
+  const div = document.createElement('div');
+  div.className = 'ai-msg ' + cls;
+  div.textContent = text;
+  if (id) div.id = id;
+  msgs.appendChild(div);
+  msgs.scrollTop = msgs.scrollHeight;
+}
+
+function getFallback(q) {
+  const l = q.toLowerCase();
+  if (l.includes('coffee') || l.includes('café')) return "Songbird Coffee & Tea House near ASU is fantastic — 4.8 stars, great Wi-Fi, and a free size upgrade with student ID!";
+  if (l.includes('bbq')) return "Myke's Woodfire BBQ in South Tempe is outstanding (4.8 stars). Get there before 6pm — the brisket sells out fast!";
+  if (l.includes('book')) return "Changing Hands Bookstore is Tempe's best indie bookstore (4.9 stars) with First Draft beer & coffee bar.";
+  if (l.includes('deal')) return "Check out Tempe Art Glass (15% off classes) and Enduro Bike & Fitness (first spin class free)!";
+  return "I can help you find the perfect Tempe business! Ask about a specific category, neighborhood, or what you're looking for.";
+}
+
+/* ════════════════════════════════════════════════════════
+   REPORT
+════════════════════════════════════════════════════════ */
+window.renderReport = function() {
+  const cat = document.getElementById('rcat').value;
+  const mn  = parseFloat(document.getElementById('rmin').value);
+  const srt = document.getElementById('rsort').value;
+  let list  = [...S.businesses].filter(b => (!cat || b.cat === cat) && b.rating >= mn);
+  if (srt === 'rating')   list.sort((a, b) => b.rating - a.rating);
+  else if (srt === 'reviews') list.sort((a, b) => b.rc - a.rc);
+  else list.sort((a, b) => a.name.localeCompare(b.name));
+
+  const avg = list.length ? (list.reduce((s, b) => s + b.rating, 0) / list.length).toFixed(2) : '—';
+  document.getElementById('rptsum').innerHTML = `
+    <div class="scard hi"><div class="sv">${list.length}</div><div class="sl">Businesses</div></div>
+    <div class="scard"><div class="sv">${avg}</div><div class="sl">Avg Rating</div></div>
+    <div class="scard"><div class="sv">${list.reduce((s,b)=>s+b.rc,0)}</div><div class="sl">Total Reviews</div></div>
+    <div class="scard"><div class="sv">${list.filter(b=>b.deal).length}</div><div class="sl">Active Deals</div></div>`;
+  document.getElementById('rptbody').innerHTML = list.map((b,i) => `
+    <tr>
+      <td style="color:var(--tx3);font-family:'Geist Mono',monospace;font-size:0.76rem;">${i+1}</td>
+      <td><strong>${b.name}</strong>${b.isNew?' <span style="font-size:0.6rem;background:var(--green);color:#fff;padding:0.1rem 0.38rem;border-radius:999px;font-weight:700;margin-left:4px;">NEW</span>':''}</td>
+      <td style="color:var(--tx2);">${b.cat}</td><td style="color:var(--tx2);">${b.hood}</td>
+      <td><div style="display:flex;align-items:center;gap:0.28rem;">${starsH(b.rating,10)}<span style="font-weight:600;font-size:0.8rem;margin-left:2px;">${b.rating>0?b.rating.toFixed(1):'—'}</span></div></td>
+      <td style="font-family:'Geist Mono',monospace;">${b.rc}</td>
+      <td style="color:${b.deal?'var(--gold)':'var(--tx3)'};">${b.deal?'Yes':'—'}</td>
+      <td style="color:${b.verified?'var(--green)':'var(--tx3)'};">${b.verified?'Yes':'—'}</td>
+    </tr>`).join('');
+};
+
+window.exportCSV = function() {
+  const rows = [['Name','Category','Neighborhood','Address','Rating','Reviews','Deal','Verified'],
+    ...[...S.businesses].map(b=>[`"${b.name}"`,`"${b.cat}"`,`"${b.hood}"`,`"${b.addr}"`,b.rating.toFixed(1),b.rc,b.deal?`"${b.deal}"`:'',b.verified?'Yes':'No'])];
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([rows.map(r=>r.join(',')).join('\n')],{type:'text/csv'}));
+  a.download = 'LocalPulse_Tempe_Report.csv'; a.click();
+  toast('CSV exported','g');
+};
+
+/* ════════════════════════════════════════════════════════
+   RENDER FUNCTIONS
+════════════════════════════════════════════════════════ */
+const CATS = [
+  {l:"All",v:"",ic:'<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>'},
+  {l:"Food & Drink",v:"Food & Drink",ic:'<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.46L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1.01 1H2.01c-.56 0-1.01-.45-1.01-1zm15.03-7c0-1.7-.8-4.16-4.73-4.98L10 11.48l-1.3-.47C4.8 11.83 4 14.28 4 15.99v2h12.03v-3z"/></svg>'},
+  {l:"Retail",v:"Retail",ic:'<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96C5 16.1 6.9 18 9 18h12v-2H9.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63H19c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0 0 23.45 5H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>'},
+  {l:"Health & Wellness",v:"Health & Wellness",ic:'<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'},
+  {l:"Services",v:"Services",ic:'<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>'},
+  {l:"Arts & Culture",v:"Arts & Culture",ic:'<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>'},
+  {l:"Education",v:"Education",ic:'<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>'},
+];
+
+function renderCats() {
+  document.getElementById('catlist').innerHTML = CATS.map(c => {
+    const cnt = c.v === '' ? S.businesses.length : S.businesses.filter(b => b.cat === c.v).length;
+    return `<button class="catbtn${S.cat===c.v?' on':''}" onclick="setCat('${c.v}',this)">${c.ic}<span>${c.l}</span><span class="cpill">${cnt}</span></button>`;
+  }).join('');
+}
+window.setCat = (v,el) => { S.cat=v; document.querySelectorAll('.catbtn').forEach(b=>b.classList.remove('on')); el.classList.add('on'); renderGrid(); };
+window.setSort = (v,el) => { S.sort=v; document.querySelectorAll('.srtbtn').forEach(b=>b.classList.remove('on')); el.classList.add('on'); renderGrid(); };
+window.doSearch = (v) => { S.q=(v||'').trim().toLowerCase(); document.getElementById('heroq').value=v||''; document.getElementById('hq').value=v||''; renderGrid(); };
+window.heroSearch = () => { S.q=document.getElementById('heroq').value.trim().toLowerCase(); S.cat=document.getElementById('herocat').value; renderCats(); renderGrid(); document.getElementById('shell').scrollIntoView({behavior:'smooth',block:'start'}); };
+window.heroCat = () => { S.cat=document.getElementById('herocat').value; renderCats(); renderGrid(); };
+
+function getFiltered() {
+  let list = [...S.businesses];
+  if (S.cat) list = list.filter(b => b.cat === S.cat);
+  if (S.q)   list = list.filter(b => b.name.toLowerCase().includes(S.q) || b.desc.toLowerCase().includes(S.q) || b.hood.toLowerCase().includes(S.q) || b.cat.toLowerCase().includes(S.q));
+  if (S.sort==='rating')   list.sort((a,b) => b.rating-a.rating);
+  else if (S.sort==='reviews') list.sort((a,b) => b.rc-a.rc);
+  else if (S.sort==='name')    list.sort((a,b) => a.name.localeCompare(b.name));
+  else list.sort((a,b) => (b.isNew-a.isNew)||0);
+  return list;
+}
+
+function renderGrid() {
+  const list = getFiltered();
+  const grid = document.getElementById('bgrid');
+  const noR  = document.getElementById('nores');
+  const rc   = document.getElementById('rescnt');
+  if (!list.length) { grid.innerHTML=''; noR.classList.add('show'); rc.innerHTML='0 results'; return; }
+  noR.classList.remove('show');
+  rc.innerHTML = `<strong>${list.length}</strong> business${list.length!==1?'es':''} · ${S.cat||'All categories'}`;
+  grid.innerHTML = list.map(b => {
+    const saved = S.bk.includes(b.id);
+    return `<div class="bcard" onclick="openBiz('${b.id}')">
+      <div class="cphoto"><img src="${b.img}" alt="${b.name}" loading="lazy">
+        <div class="ctop"><span class="cchip">${b.cat}</span>${b.deal?'<span class="dealchip">Deal</span>':''}</div>
+        <button class="bkbtn${saved?' saved':''}" onclick="togBk(event,'${b.id}')" aria-label="${saved?'Remove bookmark':'Save'}">
+          <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
+        </button>
+      </div>
+      <div class="cbody">
+        ${b.verified?'<div class="cvrf"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Verified</div>':''}
+        <div class="cname">${b.name}</div>
+        <div class="chood"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>${b.hood}</div>
+        <div class="cdesc">${b.desc}</div>
+        <div class="cfoot">
+          <div class="srow">${starsH(b.rating,11)}<span class="rnum">${b.rating>0?b.rating.toFixed(1):'New'}</span><span class="rct">(${b.rc})</span></div>
+          <button class="vbtn" onclick="openBiz('${b.id}');event.stopPropagation();">View</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function renderDeals() {
+  document.getElementById('deallist').innerHTML = S.businesses.filter(b=>b.deal).slice(0,4).map(b=>`
+    <div class="deal-row"><div class="dr-name">${b.name}</div><div class="dr-txt">${b.deal}</div>
+    <div class="dr-code-row"><span class="dr-code">${b.dc}</span><button class="cpybtn" onclick="cpyCode('${b.dc}')">Copy</button></div></div>`).join('');
+}
+window.cpyCode = (c) => navigator.clipboard.writeText(c).then(()=>toast('Code copied: '+c,'g')).catch(()=>toast('Code: '+c,'o'));
+
+function starsH(r, s=12) {
+  let h='';
+  for(let i=1;i<=5;i++) h+=`<svg class="si ${r>=i?'f':'e'}" viewBox="0 0 24 24" style="width:${s}px;height:${s}px;"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;
+  return h;
+}
+
+/* ── Business modal ── */
+window.openBiz = function(id) {
+  const b = S.businesses.find(x => x.id === id);
+  if (!b) return;
+  S.cid=id; S.stars=0; S.capDone=false;
+  document.getElementById('mimg').src=b.img; document.getElementById('mimg').alt=b.name;
+  document.getElementById('mname').textContent=b.name;
+  document.getElementById('mcat').textContent=b.cat.toUpperCase()+' · '+b.hood;
+  document.getElementById('maddr').textContent=b.addr;
+  document.getElementById('mvrf').style.display=b.verified?'flex':'none';
+  document.getElementById('mdesc').textContent=b.desc;
+  document.getElementById('mrsum').innerHTML=`<div class="rbig">${b.rating>0?b.rating.toFixed(1):'New'}</div><div><div class="srow">${starsH(b.rating,14)}</div><div class="rsub" style="margin-top:0.2rem;">${b.rc} review${b.rc!==1?'s':''}</div></div>`;
+  document.getElementById('mdealbox').innerHTML=b.deal?`<div class="dealbox"><div class="db-lbl">Active Deal</div><div class="db-txt">${b.deal}</div><div class="dr-code-row"><span class="dr-code">${b.dc}</span><button class="cpybtn" onclick="cpyCode('${b.dc}')">Copy code</button></div></div>`:'';
+  renderMRevs(b);
+  const gate=document.getElementById('rev-gate');
+  if (S.user) { gate.innerHTML=buildRevForm(); }
+  else { gate.innerHTML=`<div style="text-align:center;padding:1.25rem;background:var(--bg3);border-radius:var(--r);border:1px solid var(--bd);"><div style="font-size:0.85rem;color:var(--tx2);margin-bottom:0.75rem;">Sign in to write a review</div><button class="subbtn" style="width:auto;padding:0.55rem 1.4rem;" onclick="closeBiz();openModal('auth-ovl');">Sign In to Review</button></div>`; }
+  openModal('bovl');
+};
+
+function renderMRevs(b) {
+  document.getElementById('mrevs').innerHTML=(b.revs||[]).map(r=>`
+    <div class="rv-item"><div class="rv-hd"><span class="rv-who">${r.who}</span>
+    <div class="rv-meta"><div class="srow">${starsH(r.r,10)}</div><span class="rv-date">${r.dt}</span></div></div>
+    <div class="rv-txt">${r.txt}</div></div>`).join('');
+}
+
+function buildRevForm() {
+  return `<div class="wrev"><div class="slbl" style="margin-bottom:0.9rem;">Write a Review</div>
+    <div class="fg"><label class="flbl">Rating</label>
+      <div class="spr" id="spr"><span class="sps" data-v="1" onclick="pickS(1)">★</span><span class="sps" data-v="2" onclick="pickS(2)">★</span><span class="sps" data-v="3" onclick="pickS(3)">★</span><span class="sps" data-v="4" onclick="pickS(4)">★</span><span class="sps" data-v="5" onclick="pickS(5)">★</span></div>
+      <div class="ferr" id="es"></div></div>
+    <div class="fg"><label class="flbl">Your Review</label>
+      <textarea class="fta" id="rt" placeholder="Share your experience (min 10 characters)…" maxlength="500" oninput="updateCharCount('rt','rtc',500)"></textarea>
+      <div class="ferr" id="et"></div><div class="char-count" id="rtc">0 / 500</div></div>
+    <div class="fg"><label class="flbl">Verification</label>
+      <div class="cptr" onclick="togCap('cap','capDone')"><div class="cbox" id="cap"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div>
+      <span class="clbl">I'm not a robot</span><div class="cshld"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div></div>
+      <div class="ferr" id="ec">Please complete the verification.</div></div>
+    <button class="subbtn" onclick="submitRev()">Submit Review</button></div>`;
+}
+
+window.pickS = (v) => { S.stars=v; document.querySelectorAll('.sps').forEach(s=>s.classList.toggle('on',parseInt(s.dataset.v)<=v)); };
+window.togCap = (boxId, sk) => { S[sk]=!S[sk]; document.getElementById(boxId).classList.toggle('on',S[sk]); };
+window.updateCharCount = (iId, cId, max) => { const el=document.getElementById(iId),ct=document.getElementById(cId); if(el&&ct) ct.textContent=`${el.value.length} / ${max}`; };
+
+/* ── Bookmarks view ── */
+window.showHome = () => { document.getElementById('shell').style.display=''; document.getElementById('hero').style.display=''; document.getElementById('bkv').classList.remove('open'); document.getElementById('rptv').classList.remove('open'); renderGrid(); };
+window.showBookmarks = () => { document.getElementById('shell').style.display='none'; document.getElementById('hero').style.display='none'; document.getElementById('bkv').classList.add('open'); document.getElementById('rptv').classList.remove('open'); renderBk(); };
+window.showReport = () => { document.getElementById('shell').style.display='none'; document.getElementById('hero').style.display='none'; document.getElementById('bkv').classList.remove('open'); document.getElementById('rptv').classList.add('open'); renderReport(); };
+window.showAdmin = () => { document.getElementById('shell').style.display='none'; document.getElementById('hero').style.display='none'; document.getElementById('bkv').classList.remove('open'); document.getElementById('rptv').classList.remove('open'); document.getElementById('adminv').classList.add('open'); renderAdminPanel(); };
+
+function renderBk() {
+  const el=document.getElementById('bkgrid'), list=S.businesses.filter(b=>S.bk.includes(b.id));
+  if(!list.length){el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg><h3>No saved businesses yet</h3><p>Tap the bookmark icon on any listing.</p></div>';return;}
+  el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:1rem;">${list.map(b=>`<div class="bcard" onclick="openBiz('${b.id}')"><div class="cphoto"><img src="${b.img}" alt="${b.name}" loading="lazy"><div class="ctop"><span class="cchip">${b.cat}</span>${b.deal?'<span class="dealchip">Deal</span>':''}</div><button class="bkbtn saved" onclick="togBk(event,'${b.id}')" aria-label="Remove bookmark"><svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg></button></div><div class="cbody">${b.verified?'<div class="cvrf"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Verified</div>':''}<div class="cname">${b.name}</div><div class="chood"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>${b.hood}</div><div class="cdesc">${b.desc}</div><div class="cfoot"><div class="srow">${starsH(b.rating,11)}<span class="rnum">${b.rating>0?b.rating.toFixed(1):'New'}</span><span class="rct">(${b.rc})</span></div><button class="vbtn" onclick="openBiz('${b.id}');event.stopPropagation();">View</button></div></div></div>`).join('')}</div>`;
+}
+
+/* ── Auth UI ── */
+function updateAuthUI() {
+  const u = S.user, ud = S.userDoc;
+  document.getElementById('login-btn').style.display = u ? 'none' : '';
+  document.getElementById('user-chip-wrap').style.display = u ? '' : 'none';
+  document.getElementById('add-biz-btn').style.display = (ud?.role==='vendor'||ud?.role==='admin') ? '' : 'none';
+  document.getElementById('admin-btn').style.display = ud?.role==='admin' ? '' : 'none';
+  if (u && ud) {
+    document.getElementById('uavatar').textContent = (ud.displayName||u.email||'U')[0].toUpperCase();
+    document.getElementById('uname-chip').textContent = ud.role==='vendor' ? (ud.bizName||ud.displayName) : ud.displayName;
+    document.getElementById('vendor-dot').style.display = (ud.role==='vendor'||ud.role==='admin') ? '' : 'none';
+    if (ud.photoURL) document.getElementById('uavatar').innerHTML=`<img src="${ud.photoURL}" style="width:22px;height:22px;border-radius:50%;object-fit:cover;" alt="avatar">`;
+  }
+}
+
+window.openUserMenu = () => {
+  if(!S.user) return;
+  const role = S.userDoc?.role || 'user';
+  if(confirm(`Logged in as ${S.userDoc?.displayName||S.user.email} (${role}). Click OK to log out.`)) doLogout();
+};
+
+/* ── Modals ── */
+window.openModal = (id) => { document.getElementById(id).classList.add('open'); document.body.style.overflow='hidden'; };
+window.closeModal = (id) => { document.getElementById(id)?.classList.remove('open'); document.body.style.overflow=''; };
+window.closeBiz  = () => closeModal('bovl');
+window.closeAdd  = () => closeModal('aovl');
+window.closeAuth = () => closeModal('auth-ovl');
+window.ovlClick  = (e,id,fn) => { if(e.target===document.getElementById(id)) fn(); };
+
+window.openAdd = () => {
+  if(!S.user||(S.userDoc?.role!=='vendor'&&S.userDoc?.role!=='admin')) { toast('Vendor login required to list a business.','r'); openModal('auth-ovl'); return; }
+  document.getElementById('add-vendor-label').textContent=`Listing as: ${S.userDoc?.bizName||S.userDoc?.displayName}`;
+  openModal('aovl');
+};
+
+/* ── Theme ── */
+window.toggleTheme = () => { const h=document.documentElement; h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark'); updateThemeUI(); };
+function updateThemeUI() { const d=document.documentElement.getAttribute('data-theme')==='dark'; document.getElementById('isun').style.display=d?'none':'block'; document.getElementById('imoon').style.display=d?'block':'none'; }
+
+/* ── Auth tab switching ── */
+window.switchAuthTab = (tab,el) => { document.querySelectorAll('.auth-tab').forEach(t=>t.classList.remove('on')); el.classList.add('on'); document.getElementById('auth-user-pane').classList.toggle('on',tab==='user'); document.getElementById('auth-vendor-pane').classList.toggle('on',tab==='vendor'); };
+
+/* ── Validation helpers ── */
+function validateEmail(e) { return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(e); }
+function showFieldErr(id, msg) { const el=document.getElementById(id); if(el){el.textContent=msg; el.classList.add('show'); setTimeout(()=>el.classList.remove('show'),4000);} }
+window.liveValidateMinLen = (iId,eId,min) => { const el=document.getElementById(iId),err=document.getElementById(eId); if(!el||!err)return; const v=el.value.trim(); if(v.length>0&&v.length<min){err.textContent=`At least ${min} characters required.`;err.classList.add('show');}else{err.classList.remove('show');} };
+window.liveValidateAddress = (iId,eId) => { const v=document.getElementById(iId).value.trim(),err=document.getElementById(eId); if(!v){err.classList.remove('show');return;} if(!/^\d/.test(v)||v.length<8){err.textContent='Please enter a valid street address.';err.classList.add('show');}else{err.classList.remove('show');} };
+
+/* ── Toast ── */
+let tTimer;
+window.toast = (msg, type='g') => { const el=document.getElementById('toast'); el.className=type; el.classList.add('show'); document.getElementById('tmsg').textContent=msg; clearTimeout(tTimer); tTimer=setTimeout(()=>el.classList.remove('show'),3200); };
+
+/* ── INIT ── */
+document.addEventListener('DOMContentLoaded', () => {
+  updateThemeUI();
+  loadBusinesses();
+  document.getElementById('sbiz').textContent = '…';
+  // Admin button hidden by default, shown after auth check
+  document.getElementById('admin-btn').style.display = 'none';
+});
+</script>
 </head>
 <body>
 
+<!-- HEADER -->
 <header>
   <div class="hi">
     <div class="logo" onclick="showHome()">
@@ -287,30 +1169,34 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
     <div class="loc"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>Tempe, AZ</div>
     <div class="hsearch">
       <svg viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"/></svg>
-      <input type="text" id="hq" placeholder="Search businesses, neighborhoods…" oninput="doSearch(this.value)" aria-label="Search">
+      <input type="text" id="hq" placeholder="Search businesses…" oninput="doSearch(this.value)" aria-label="Search">
     </div>
     <div class="hright">
-      <button class="tt" onclick="toggleTheme()" aria-label="Toggle theme" title="Toggle dark / light mode">
+      <button class="tt" onclick="toggleTheme()" aria-label="Toggle theme">
         <div class="tt-k" id="ttk">
           <svg id="isun" viewBox="0 0 24 24" style="display:none"><path fill="#FBBF24" d="M12 7c-2.76 0-5 2.24-5 5s2.24 5 5 5 5-2.24 5-5-2.24-5-5-5zM2 13h2c.55 0 1-.45 1-1s-.45-1-1-1H2c-.55 0-1 .45-1 1s.45 1 1 1zm18 0h2c.55 0 1-.45 1-1s-.45-1-1-1h-2c-.55 0-1 .45-1 1s.45 1 1 1zM11 2v2c0 .55.45 1 1 1s1-.45 1-1V2c0-.55-.45-1-1-1s-1 .45-1 1zm0 18v2c0 .55.45 1 1 1s1-.45 1-1v-2c0-.55-.45-1-1-1s-1 .45-1 1zM5.99 4.58a.996.996 0 0 0-1.41 0 .996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0s.39-1.03 0-1.41L5.99 4.58zm12.37 12.37a.996.996 0 0 0-1.41 0 .996.996 0 0 0 0 1.41l1.06 1.06c.39.39 1.03.39 1.41 0a.996.996 0 0 0 0-1.41l-1.06-1.06zm1.06-12.37l-1.06 1.06a.996.996 0 0 0 0 1.41c.39.39 1.03.39 1.41 0l1.06-1.06a.996.996 0 0 0 0-1.41.996.996 0 0 0-1.41 0zM7.05 18.36l-1.06 1.06a.996.996 0 0 0 0 1.41c.39.39 1.03.39 1.41 0l1.06-1.06a.996.996 0 0 0 0-1.41.996.996 0 0 0-1.41 0z"/></svg>
           <svg id="imoon" viewBox="0 0 24 24"><path fill="#94A3B8" d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9 9-4.03 9-9c0-.46-.04-.92-.1-1.36a5.389 5.389 0 0 1-4.4 2.26 5.403 5.403 0 0 1-3.14-9.8c-.44-.06-.9-.1-1.36-.1z"/></svg>
         </div>
       </button>
-      <button class="ibtn" onclick="showBookmarks()" aria-label="Saved businesses">
-        <svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg>
-        <span class="bdg" id="bkbdg" style="display:none">0</span>
-      </button>
-      <button class="ibtn" onclick="showReport()" aria-label="Analytics">
-        <svg viewBox="0 0 24 24"><path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.1h-15V5h15v14.1zm0-16.1h-15C3.12 3 2 4.12 2 5.5v13C2 19.88 3.12 21 4.5 21h15c1.38 0 2.5-1.12 2.5-2.5v-13C21 4.12 19.88 3 18.5 3z"/></svg>
-      </button>
-      <button class="addbtn" onclick="openAdd()">
-        <svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>
-        Add Business
-      </button>
+      <button class="ibtn" onclick="showBookmarks()" aria-label="Saved"><svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg><span class="bdg" id="bkbdg" style="display:none">0</span></button>
+      <button class="ibtn" onclick="showReport()" aria-label="Report"><svg viewBox="0 0 24 24"><path d="M9 17H7v-7h2v7zm4 0h-2V7h2v10zm4 0h-2v-4h2v4zm2.5 2.1h-15V5h15v14.1zm0-16.1h-15C3.12 3 2 4.12 2 5.5v13C2 19.88 3.12 21 4.5 21h15c1.38 0 2.5-1.12 2.5-2.5v-13C21 4.12 19.88 3 18.5 3z"/></svg></button>
+      <button class="ibtn" id="admin-btn" onclick="showAdmin()" aria-label="Admin" title="Admin Panel" style="display:none;border-color:rgba(245,158,11,0.4);color:var(--gold);"><svg viewBox="0 0 24 24"><path d="M17 11c.34 0 .67.03 1 .08V6.27L10.5 3 3 6.27v4.91c0 4.54 3.2 8.79 7.5 9.82.55-.13 1.08-.32 1.6-.55A6.963 6.963 0 0 1 10 17c0-3.87 3.13-7 7-7z"/><path d="M17 13c-2.21 0-4 1.79-4 4s1.79 4 4 4 4-1.79 4-4-1.79-4-4-4zm0 1.38c.62 0 1.12.51 1.12 1.12s-.51 1.12-1.12 1.12-1.12-.51-1.12-1.12.5-1.12 1.12-1.12zm0 5.37c-.93 0-1.74-.46-2.24-1.17.05-.72 1.51-1.08 2.24-1.08s2.19.36 2.24 1.08c-.5.71-1.31 1.17-2.24 1.17z"/></svg></button>
+      <div id="auth-area">
+        <button class="addbtn" onclick="openModal('auth-ovl')" id="login-btn"><svg viewBox="0 0 24 24"><path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z"/></svg>Sign In</button>
+        <div id="user-chip-wrap" style="display:none">
+          <div class="user-chip" onclick="openUserMenu()">
+            <div class="user-avatar" id="uavatar"></div>
+            <span class="user-chip-name" id="uname-chip"></span>
+            <div class="vendor-dot" id="vendor-dot" style="display:none"></div>
+          </div>
+        </div>
+      </div>
+      <button class="addbtn" id="add-biz-btn" style="display:none" onclick="openAdd()"><svg viewBox="0 0 24 24"><path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z"/></svg>Add Business</button>
     </div>
   </div>
 </header>
 
+<!-- HERO (centered) -->
 <section id="hero">
   <div class="hero-in">
     <div class="hero-tag"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>Tempe, Arizona — Local Business Directory</div>
@@ -330,7 +1216,7 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
       <button onclick="heroSearch()">Search</button>
     </div>
     <div class="hero-stats">
-      <div><div class="hs-val" id="sbiz">15</div><div class="hs-lbl">Businesses Listed</div></div>
+      <div><div class="hs-val" id="sbiz">…</div><div class="hs-lbl">Businesses Listed</div></div>
       <div><div class="hs-val">80+</div><div class="hs-lbl">Community Reviews</div></div>
       <div><div class="hs-val">6</div><div class="hs-lbl">Neighborhoods</div></div>
       <div><div class="hs-val">Free</div><div class="hs-lbl">To List Your Business</div></div>
@@ -338,25 +1224,17 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
   </div>
 </section>
 
+<!-- SHELL -->
 <div id="shell">
   <aside id="sb">
-    <div class="sp">
-      <div class="sph"><span class="spt">Categories</span></div>
-      <div class="spb" id="catlist"></div>
-    </div>
-    <div class="sp">
-      <div class="sph"><span class="spt">Sort By</span></div>
-      <div class="spb" id="sortlist">
-        <button class="srtbtn on" data-s="rating" onclick="setSort('rating',this)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>Highest Rated<div class="srt-radio"></div></button>
-        <button class="srtbtn" data-s="reviews" onclick="setSort('reviews',this)"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>Most Reviews<div class="srt-radio"></div></button>
-        <button class="srtbtn" data-s="name" onclick="setSort('name',this)"><svg viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>Name A–Z<div class="srt-radio"></div></button>
-        <button class="srtbtn" data-s="newest" onclick="setSort('newest',this)"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>Newest First<div class="srt-radio"></div></button>
-      </div>
-    </div>
-    <div class="sp">
-      <div class="sph"><span class="spt">Active Deals</span><span class="livebdg">Live</span></div>
-      <div class="spb" style="padding:0.45rem 0.9rem 0.7rem;" id="deallist"></div>
-    </div>
+    <div class="sp"><div class="sph"><span class="spt">Categories</span></div><div class="spb" id="catlist"></div></div>
+    <div class="sp"><div class="sph"><span class="spt">Sort By</span></div><div class="spb" id="sortlist">
+      <button class="srtbtn on" data-s="rating" onclick="setSort('rating',this)"><svg viewBox="0 0 24 24"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>Highest Rated<div class="srt-radio"></div></button>
+      <button class="srtbtn" data-s="reviews" onclick="setSort('reviews',this)"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2z"/></svg>Most Reviews<div class="srt-radio"></div></button>
+      <button class="srtbtn" data-s="name" onclick="setSort('name',this)"><svg viewBox="0 0 24 24"><path d="M11 7h2v2h-2zm0 4h2v6h-2zm1-9C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8z"/></svg>Name A–Z<div class="srt-radio"></div></button>
+      <button class="srtbtn" data-s="newest" onclick="setSort('newest',this)"><svg viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm-2 14.5v-9l6 4.5-6 4.5z"/></svg>Newest First<div class="srt-radio"></div></button>
+    </div></div>
+    <div class="sp"><div class="sph"><span class="spt">Active Deals</span><span class="livebdg">Live</span></div><div class="spb" style="padding:0.45rem 0.9rem 0.7rem;" id="deallist"></div></div>
   </aside>
   <div id="main">
     <div class="toolbar"><div class="rescnt" id="rescnt">Loading…</div></div>
@@ -365,77 +1243,109 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
   </div>
 </div>
 
-<!-- BOOKMARKS -->
-<div class="av" id="bkv">
-  <button class="vback" onclick="showHome()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back to Directory</button>
-  <div class="vtitle">Saved Businesses</div>
-  <div id="bkgrid"></div>
-</div>
+<!-- BOOKMARKS VIEW -->
+<div class="av" id="bkv"><button class="vback" onclick="showHome()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back</button><div class="vtitle">Saved Businesses</div><div id="bkgrid"></div></div>
 
-<!-- REPORT -->
+<!-- REPORT VIEW -->
 <div class="av" id="rptv">
-  <button class="vback" onclick="showHome()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back to Directory</button>
+  <button class="vback" onclick="showHome()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back</button>
   <div class="vtitle">Analytics Report</div>
   <div class="rctrl">
     <div class="rf"><label>Category</label><select id="rcat" onchange="renderReport()"><option value="">All</option><option>Food &amp; Drink</option><option>Retail</option><option>Health &amp; Wellness</option><option>Services</option><option>Arts &amp; Culture</option><option>Education</option></select></div>
     <div class="rf"><label>Min Rating</label><select id="rmin" onchange="renderReport()"><option value="0">Any</option><option value="3">3+</option><option value="4">4+</option><option value="4.5">4.5+</option></select></div>
     <div class="rf"><label>Sort</label><select id="rsort" onchange="renderReport()"><option value="rating">Highest Rating</option><option value="reviews">Most Reviews</option><option value="name">A–Z</option></select></div>
-    <div class="rf" style="margin-left:auto;"><label>&nbsp;</label><button class="expbtn" onclick="exportCSV()"><svg viewBox="0 0 24 24"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>Export CSV</button></div>
+    <div class="rf" style="margin-left:auto;"><label>&nbsp;</label><button class="expbtn" onclick="exportCSV()"><svg viewBox="0 0 24 24" style="width:12px;height:12px;fill:#fff"><path d="M19 9h-4V3H9v6H5l7 7 7-7zm-8 2V5h2v6h1.17L12 13.17 9.83 11H11zm-6 7h14v2H5v-2z"/></svg>Export CSV</button></div>
   </div>
   <div class="sumrow" id="rptsum"></div>
   <div class="tblwrap"><table class="tbl"><thead><tr><th>#</th><th>Business</th><th>Category</th><th>Neighborhood</th><th>Rating</th><th>Reviews</th><th>Deal</th><th>Verified</th></tr></thead><tbody id="rptbody"></tbody></table></div>
 </div>
 
-<!-- BIZ MODAL -->
+<!-- ADMIN VIEW -->
+<div class="av" id="adminv">
+  <button class="vback" onclick="showHome()"><svg viewBox="0 0 24 24"><path d="M20 11H7.83l5.59-5.59L12 4l-8 8 8 8 1.41-1.41L7.83 13H20v-2z"/></svg>Back</button>
+  <div class="vtitle">Admin Panel</div>
+  <div style="background:var(--bg2);border:1px solid var(--bd);border-radius:var(--r);padding:1.25rem 1.5rem;margin-bottom:1.25rem;">
+    <div style="display:flex;align-items:center;gap:0.75rem;margin-bottom:1rem;">
+      <span style="font-size:0.72rem;font-weight:700;text-transform:uppercase;letter-spacing:0.09em;color:var(--tx3);">Pending Verification</span>
+      <span id="admin-count" style="background:var(--gold);color:#000;font-size:0.68rem;font-weight:700;padding:0.12rem 0.45rem;border-radius:999px;">0</span>
+    </div>
+    <div id="admin-list"></div>
+  </div>
+</div>
+
+<!-- BUSINESS MODAL -->
 <div class="ovl" id="bovl" onclick="ovlClick(event,'bovl',closeBiz)">
   <div class="modal">
-    <div class="mpho" id="mpho">
-      <button class="mcls" onclick="closeBiz()">✕</button>
-      <img id="mimg" src="" alt="">
-      <div class="mpho-name" id="mname"></div>
-      <div class="mpho-cat" id="mcat"></div>
-    </div>
+    <div class="mpho" id="mpho"><button class="mcls" onclick="closeBiz()">✕</button><img id="mimg" src="" alt=""><div class="mpho-name" id="mname"></div><div class="mpho-cat" id="mcat"></div></div>
     <div class="mbody">
-      <div class="mmeta">
-        <div class="maddr"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg><span id="maddr"></span></div>
-        <div class="mvrf" id="mvrf" style="display:none"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Verified</div>
-      </div>
+      <div class="mmeta"><div class="maddr"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg><span id="maddr"></span></div><div class="mvrf" id="mvrf" style="display:none"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Verified</div></div>
       <p class="mdesc" id="mdesc"></p>
       <div class="rsum" id="mrsum"></div>
       <div id="mdealbox"></div>
       <div class="slbl">Community Reviews</div>
       <div id="mrevs"></div>
-      <div class="wrev">
-        <div class="slbl" style="margin-bottom:0.9rem;">Write a Review</div>
-        <div class="fg"><label class="flbl">Your Name</label><input class="fi" id="rn" type="text" placeholder="e.g. Maria S." maxlength="60" aria-label="Your name"><div class="ferr" id="en">Please enter your name (at least 2 characters).</div></div>
-        <div class="fg"><label class="flbl">Rating</label><div class="spr" id="spr"><span class="sps" data-v="1" onclick="pickS(1)">★</span><span class="sps" data-v="2" onclick="pickS(2)">★</span><span class="sps" data-v="3" onclick="pickS(3)">★</span><span class="sps" data-v="4" onclick="pickS(4)">★</span><span class="sps" data-v="5" onclick="pickS(5)">★</span></div><div class="ferr" id="es">Please select a rating.</div></div>
-        <div class="fg"><label class="flbl">Your Review</label><textarea class="fta" id="rt" placeholder="Share your experience…" maxlength="500" aria-label="Review text"></textarea><div class="ferr" id="et">Please write at least 10 characters.</div></div>
-        <div class="fg"><label class="flbl">Verification</label>
-          <div class="cptr" onclick="togCap('cap','capDone')"><div class="cbox" id="cap"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><span class="clbl">I'm not a robot</span><div class="cshld"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div></div>
-          <div class="ferr" id="ec">Please complete the verification.</div>
+      <div id="rev-gate"></div>
+    </div>
+  </div>
+</div>
+
+<!-- AUTH MODAL -->
+<div class="ovl" id="auth-ovl" onclick="ovlClick(event,'auth-ovl',closeAuth)">
+  <div class="modal" style="max-width:440px;">
+    <div class="amhd"><button class="mcls" onclick="closeAuth()" style="top:0.9rem;right:0.9rem;">✕</button><div class="amt">Welcome to LocalPulse</div><div class="ams">Sign in to review, save, and list businesses</div></div>
+    <div class="mbody">
+      <div class="auth-tabs">
+        <button class="auth-tab on" onclick="switchAuthTab('user',this)">Community User</button>
+        <button class="auth-tab" onclick="switchAuthTab('vendor',this)">Business Vendor</button>
+      </div>
+
+      <!-- USER PANE -->
+      <div class="auth-pane on" id="auth-user-pane">
+        <div class="role-chip user" style="margin-bottom:1rem;">Write reviews &amp; save businesses</div>
+        <!-- Google Sign-In -->
+        <button onclick="signInWithGoogle()" style="width:100%;padding:0.72rem;background:#fff;color:#3c4043;border:1.5px solid #dadce0;border-radius:var(--rsm);font-size:0.88rem;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.6rem;transition:box-shadow 0.2s;margin-bottom:0.85rem;" onmouseover="this.style.boxShadow='0 2px 8px rgba(0,0,0,0.15)'" onmouseout="this.style.boxShadow='none'">
+          <svg width="18" height="18" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Continue with Google
+        </button>
+        <div class="auth-divider">or use email</div>
+        <div class="fg" style="margin-top:0.75rem;"><label class="flbl">Email</label><input class="fi" id="ep-email" type="email" placeholder="you@example.com" maxlength="80"><div class="ferr" id="ep-email-err"></div></div>
+        <div class="fg"><label class="flbl">Password</label><input class="fi" id="ep-pass" type="password" placeholder="Min 6 characters" maxlength="50"><div class="ferr" id="ep-pass-err"></div></div>
+        <div class="fg" style="display:flex;align-items:center;gap:0.5rem;"><input type="checkbox" id="ep-register" style="width:16px;height:16px;cursor:pointer;accent-color:var(--accent);"><label for="ep-register" style="font-size:0.82rem;color:var(--tx2);cursor:pointer;">Create a new account</label></div>
+        <button class="subbtn" onclick="signInWithEmail()">Sign In</button>
+      </div>
+
+      <!-- VENDOR PANE -->
+      <div class="auth-pane" id="auth-vendor-pane">
+        <div class="role-chip vendor" style="margin-bottom:1rem;">List &amp; manage your Tempe business</div>
+        <div style="background:rgba(245,158,11,0.08);border:1px solid rgba(245,158,11,0.2);border-radius:var(--rsm);padding:0.85rem;margin-bottom:1rem;font-size:0.82rem;color:var(--tx2);line-height:1.5;">
+          Vendor access requires an approval code from LocalPulse. Contact us at <strong><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="dcb0b3bfbdb0aca9b0afb9f2a8b9b1acb99cbbb1bdb5b0f2bfb3b1">[email&#160;protected]</a></strong> or ask your regional FBLA coordinator to get a code.
         </div>
-        <button class="subbtn" onclick="submitRev()">Submit Review</button>
+        <div style="margin-bottom:0.75rem;">First, sign in with Google or email above, then enter your code below.</div>
+        <!-- Google for vendor too -->
+        <button onclick="signInWithGoogle()" style="width:100%;padding:0.65rem;background:#fff;color:#3c4043;border:1.5px solid #dadce0;border-radius:var(--rsm);font-size:0.85rem;font-weight:500;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:0.6rem;margin-bottom:1rem;">
+          <svg width="16" height="16" viewBox="0 0 48 48"><path fill="#EA4335" d="M24 9.5c3.54 0 6.71 1.22 9.21 3.6l6.85-6.85C35.9 2.38 30.47 0 24 0 14.62 0 6.51 5.38 2.56 13.22l7.98 6.19C12.43 13.72 17.74 9.5 24 9.5z"/><path fill="#4285F4" d="M46.98 24.55c0-1.57-.15-3.09-.38-4.55H24v9.02h12.94c-.58 2.96-2.26 5.48-4.78 7.18l7.73 6c4.51-4.18 7.09-10.36 7.09-17.65z"/><path fill="#FBBC05" d="M10.53 28.59c-.48-1.45-.76-2.99-.76-4.59s.27-3.14.76-4.59l-7.98-6.19C.92 16.46 0 20.12 0 24c0 3.88.92 7.54 2.56 10.78l7.97-6.19z"/><path fill="#34A853" d="M24 48c6.48 0 11.93-2.13 15.89-5.81l-7.73-6c-2.15 1.45-4.92 2.3-8.16 2.3-6.26 0-11.57-4.22-13.47-9.91l-7.98 6.19C6.51 42.62 14.62 48 24 48z"/></svg>
+          Sign in with Google first
+        </button>
+        <div class="fg"><label class="flbl">Your Business Name</label><input class="fi" id="vendor-bizname" type="text" placeholder="e.g. House of Tricks" maxlength="60"><div class="ferr" id="vc-biz-err"></div></div>
+        <div class="fg"><label class="flbl">Vendor Approval Code</label><input class="fi" id="vendor-code" type="text" placeholder="Enter your code (e.g. TEMPE2026)" maxlength="30" style="font-family:'Geist Mono',monospace;letter-spacing:0.05em;text-transform:uppercase;"><div class="ferr" id="vc-code-err"></div></div>
+        <button class="subbtn" onclick="upgradeToVendor()" style="background:var(--gold);color:#000;">Activate Vendor Account</button>
       </div>
     </div>
   </div>
 </div>
 
-<!-- ADD MODAL -->
+<!-- ADD BUSINESS MODAL -->
 <div class="ovl" id="aovl" onclick="ovlClick(event,'aovl',closeAdd)">
   <div class="modal" style="max-width:510px;">
-    <div class="amhd">
-      <button class="mcls" onclick="closeAdd()" style="top:0.9rem;right:0.9rem;">✕</button>
-      <div class="amt">List Your Business</div>
-      <div class="ams">Free to list · Reach Tempe locals immediately</div>
-    </div>
+    <div class="amhd"><button class="mcls" onclick="closeAdd()" style="top:0.9rem;right:0.9rem;">✕</button><div class="amt">List Your Business</div><div class="ams" id="add-vendor-label">Listing as vendor</div></div>
     <div class="mbody">
-      <div class="fg"><label class="flbl">Business Name</label><input class="fi" id="an" type="text" placeholder="e.g. Sonoran Sweets" maxlength="80"><div class="ferr" id="aen">Please enter a business name.</div></div>
+      <div class="fg"><label class="flbl">Business Name</label><input class="fi" id="an" type="text" placeholder="e.g. Sonoran Sweets" maxlength="80" oninput="liveValidateMinLen('an','aen',2)"><div class="ferr" id="aen"></div></div>
       <div style="display:grid;grid-template-columns:1fr 1fr;gap:0.8rem;">
-        <div class="fg"><label class="flbl">Category</label><select class="fsel" id="ac"><option value="">Select…</option><option>Food &amp; Drink</option><option>Retail</option><option>Health &amp; Wellness</option><option>Services</option><option>Arts &amp; Culture</option><option>Education</option></select><div class="ferr" id="aec">Please select a category.</div></div>
-        <div class="fg"><label class="flbl">Neighborhood</label><select class="fsel" id="ah"><option value="">Select…</option><option>Downtown Tempe</option><option>Mill Avenue District</option><option>ASU / University</option><option>South Tempe</option><option>McClintock / Rural</option><option>Kyrene Corridor</option></select><div class="ferr" id="aeh">Please select a neighborhood.</div></div>
+        <div class="fg"><label class="flbl">Category</label><select class="fsel" id="ac"><option value="">Select…</option><option>Food &amp; Drink</option><option>Retail</option><option>Health &amp; Wellness</option><option>Services</option><option>Arts &amp; Culture</option><option>Education</option></select><div class="ferr" id="aec"></div></div>
+        <div class="fg"><label class="flbl">Neighborhood</label><select class="fsel" id="ah"><option value="">Select…</option><option>Downtown Tempe</option><option>Mill Avenue District</option><option>ASU / University</option><option>South Tempe</option><option>McClintock / Rural</option><option>Kyrene Corridor</option></select><div class="ferr" id="aeh"></div></div>
       </div>
-      <div class="fg"><label class="flbl">Address</label><input class="fi" id="aa" type="text" placeholder="123 Mill Ave, Tempe, AZ 85281" maxlength="120"><div class="ferr" id="aea">Please enter an address.</div></div>
-      <div class="fg"><label class="flbl">Description</label><textarea class="fta" id="ad" placeholder="What makes your business special?" maxlength="300"></textarea><div class="ferr" id="aed">Please enter a description (min 20 characters).</div></div>
+      <div class="fg"><label class="flbl">Address</label><input class="fi" id="aa" type="text" placeholder="123 Mill Ave, Tempe, AZ 85281" maxlength="120" oninput="liveValidateAddress('aa','aea')"><div class="ferr" id="aea"></div></div>
+      <div class="fg"><label class="flbl">Description</label><textarea class="fta" id="ad" placeholder="What makes your business special?" maxlength="300" oninput="liveValidateMinLen('ad','aed',20);updateCharCount('ad','adc',300)"></textarea><div class="ferr" id="aed"></div><div class="char-count" id="adc">0 / 300</div></div>
       <div class="fg"><label class="flbl">Deal / Coupon <span style="color:var(--tx3);font-weight:400;">(optional)</span></label><input class="fi" id="adl" type="text" placeholder="e.g. 10% off with code TEMPE10" maxlength="80"></div>
       <div class="fg"><label class="flbl">Verification</label>
         <div class="cptr" onclick="togCap('acap','acapDone')"><div class="cbox" id="acap"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg></div><span class="clbl">I'm not a robot</span><div class="cshld"><svg viewBox="0 0 24 24"><path d="M12 1L3 5v6c0 5.55 3.84 10.74 9 12 5.16-1.26 9-6.45 9-12V5l-9-4z"/></svg></div></div>
@@ -446,163 +1356,15 @@ header{position:sticky;top:0;z-index:100;background:var(--hdr);border-bottom:1px
   </div>
 </div>
 
-<div id="toast"><div class="tdot"></div><span id="tmsg"></span></div>
-
-<script>
-const BIZ=[
-  {id:1,name:"House of Tricks",cat:"Food & Drink",hood:"Mill Avenue District",addr:"114 E 7th St, Tempe AZ 85281",
-   desc:"A Tempe institution since 1987, set in charming 1920s bungalows. New American seasonal cuisine with a legendary patio.",
-   img:"https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80",
-   rating:4.7,rc:3,deal:"Weeknight 2-entree dinner: complimentary dessert",dc:"TRICKS2",v:true,n:false,
-   revs:[{who:"Priya M.",r:5,txt:"Magical patio dining. The duck was incredible and service was attentive all evening.",dt:"Feb 2026"},{who:"James T.",r:4,txt:"A Tempe institution for good reason. Charming ambiance and quality ingredients.",dt:"Jan 2026"},{who:"Sofia R.",r:5,txt:"Took my parents here when visiting ASU — bruschetta was a standout.",dt:"Mar 2026"}]},
-  {id:2,name:"Changing Hands Bookstore",cat:"Retail",hood:"Mill Avenue District",addr:"6428 S McClintock Dr, Tempe AZ 85283",
-   desc:"Arizona's beloved independent bookstore with an outstanding local author section, First Draft beer and coffee bar, and a packed events calendar.",
-   img:"https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=600&q=80",
-   rating:4.9,rc:4,deal:"10% off any purchase over $30 — mention LocalPulse",dc:"LPBOOKS10",v:true,n:false,
-   revs:[{who:"Ananya P.",r:5,txt:"My favorite place in all of Tempe. Staff recs are always perfect and First Draft is the ideal pairing.",dt:"Feb 2026"},{who:"Kevin L.",r:5,txt:"Discovering this place was a highlight of moving to AZ. Incredible curation and genuine community feel.",dt:"Jan 2026"},{who:"Mei C.",r:4,txt:"Great selection and warm atmosphere. Gets busy on weekends but that shows how loved it is.",dt:"Mar 2026"},{who:"Daniel F.",r:5,txt:"Nothing beats browsing here Sunday morning with a coffee from First Draft.",dt:"Dec 2025"}]},
-  {id:3,name:"The Boulders on Broadway",cat:"Food & Drink",hood:"South Tempe",addr:"530 W Broadway Rd, Tempe AZ 85282",
-   desc:"A true Tempe dive bar with an epic outdoor beer garden, live music nights, and some of the best buffalo wings in the East Valley.",
-   img:"https://images.unsplash.com/photo-1572116469696-31de0f17cc34?w=600&q=80",
-   rating:4.4,rc:2,deal:"Happy Hour 3–6pm daily — $3 drafts",dc:"BOULDERHHOUR",v:true,n:false,
-   revs:[{who:"Tyler W.",r:4,txt:"Best beer garden in Tempe, hands down. Wings are great and live music on Fridays is solid.",dt:"Feb 2026"},{who:"Riya S.",r:5,txt:"Such a genuine local spot. Trivia nights are super fun — highly recommend.",dt:"Jan 2026"}]},
-  {id:4,name:"Songbird Coffee & Tea House",cat:"Food & Drink",hood:"ASU / University",addr:"1401 E University Dr, Tempe AZ 85281",
-   desc:"A cozy, study-friendly indie café near ASU known for specialty teas, seasonal lattes, and a community that never rushes you out.",
-   img:"https://images.unsplash.com/photo-1501339847302-ac426a4a7cbb?w=600&q=80",
-   rating:4.8,rc:3,deal:"Free size upgrade with any student ID",dc:"SONGBIRD",v:true,n:false,
-   revs:[{who:"Ayaan K.",r:5,txt:"My go-to study spot. The horchata latte is divine and they never rush you out.",dt:"Mar 2026"},{who:"Lisa V.",r:5,txt:"Best coffee near ASU. Great Wi-Fi and seasonal specials worth returning for.",dt:"Feb 2026"},{who:"Marcus T.",r:4,txt:"Solid café. The pour-over is excellent and the matcha is legit.",dt:"Jan 2026"}]},
-  {id:5,name:"Tempe Bicycle",cat:"Services",hood:"ASU / University",addr:"330 W University Dr, Tempe AZ 85281",
-   desc:"Tempe's go-to bike shop since 1979. Expert repairs, rentals, and a wide selection for every rider — perfect for ASU students and commuters.",
-   img:"https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80",
-   rating:4.6,rc:2,deal:"Free tune-up with any bicycle purchase",dc:"TBIKE2026",v:true,n:false,
-   revs:[{who:"Chris N.",r:5,txt:"Fixed my flat in 20 minutes and didn't charge. These guys genuinely care about Tempe cyclists.",dt:"Feb 2026"},{who:"Sara H.",r:4,txt:"Friendly, knowledgeable staff. Great commuter bikes and renting was easy.",dt:"Jan 2026"}]},
-  {id:6,name:"Tempe Farmers Market",cat:"Retail",hood:"McClintock / Rural",addr:"2000 E Rio Salado Pkwy, Tempe AZ 85281",
-   desc:"Weekly outdoor market with local Arizona farmers, artisan food vendors, handmade crafts, and live entertainment. Saturdays 8am–noon.",
-   img:"https://images.unsplash.com/photo-1488459716781-31db52582fe9?w=600&q=80",
-   rating:4.5,rc:2,deal:"Free canvas tote with $25+ purchase — Saturdays",dc:"MARKET25",v:true,n:false,
-   revs:[{who:"Fatima A.",r:5,txt:"Love starting Saturday here. Fresh AZ produce, local honey, and the tamale vendor is a must.",dt:"Mar 2026"},{who:"Greg P.",r:4,txt:"A wonderful local market. Feels like the community genuinely showing up for itself.",dt:"Feb 2026"}]},
-  {id:7,name:"Francine Restaurant",cat:"Food & Drink",hood:"Downtown Tempe",addr:"1840 E Camelback Rd, Phoenix (serves Tempe)",
-   desc:"French-inspired American bistro with a stunning patio, fresh seasonal ingredients, and a brunch menu locals consistently rave about.",
-   img:"https://images.unsplash.com/photo-1559339352-11d035aa65de?w=600&q=80",
-   rating:4.8,rc:2,deal:"Sunday brunch: bottomless mimosas with any entrée 10am–2pm",dc:"FRANCINEBRUNCH",v:true,n:false,
-   revs:[{who:"Natalie O.",r:5,txt:"Hands down one of the best brunches in the Valley. Ricotta pancakes were exceptional.",dt:"Mar 2026"},{who:"Ethan J.",r:5,txt:"Incredible French-inspired menu, excellent natural wine, service that's warm without being stuffy.",dt:"Jan 2026"}]},
-  {id:8,name:"Enduro Bike & Fitness",cat:"Health & Wellness",hood:"South Tempe",addr:"1540 E Southern Ave, Tempe AZ 85282",
-   desc:"Tempe's premier cycling studio offering spin classes, personal training, and professional bike fitting. First class free for new riders.",
-   img:"https://images.unsplash.com/photo-1571019614242-c5c5dee9f50b?w=600&q=80",
-   rating:4.3,rc:2,deal:"First spin class FREE for new members",dc:"ENDURO1",v:true,n:true,
-   revs:[{who:"Rachel B.",r:4,txt:"Great instructors who genuinely motivate you. Spin classes are intense in the best way.",dt:"Feb 2026"},{who:"Omar S.",r:5,txt:"Bike fitting service is worth every penny. My knee pain disappeared after the adjustment.",dt:"Jan 2026"}]},
-  {id:9,name:"Tempe Art Glass",cat:"Arts & Culture",hood:"Downtown Tempe",addr:"615 S College Ave, Tempe AZ 85281",
-   desc:"A hidden Tempe gem offering glass-blowing classes, custom art commissions, and one-of-a-kind handmade gifts. Drop-in workshops on weekends.",
-   img:"https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&q=80",
-   rating:4.9,rc:3,deal:"15% off any class — mention LocalPulse",dc:"GLASS15",v:true,n:true,
-   revs:[{who:"Isabelle M.",r:5,txt:"Took a glass-blowing class with my sister — most unique experience. Instructors are so patient.",dt:"Mar 2026"},{who:"Rajan V.",r:5,txt:"Bought a custom piece as a gift and it was perfect. Craftsmanship is exceptional.",dt:"Feb 2026"},{who:"Hannah W.",r:5,txt:"Weekend workshops are fantastic for date night. You leave with something you made yourself.",dt:"Jan 2026"}]},
-  {id:10,name:"Gentle Strength Co-op",cat:"Retail",hood:"ASU / University",addr:"234 W University Dr, Tempe AZ 85281",
-   desc:"Tempe's original natural food co-op since 1976. Organic produce, bulk foods, local Arizona products, and a beloved deli. Community-owned.",
-   img:"https://images.unsplash.com/photo-1542838132-92c53300491e?w=600&q=80",
-   rating:4.6,rc:2,deal:"Membership: 10% off all purchases permanently",dc:"COOP2026",v:true,n:false,
-   revs:[{who:"Priya L.",r:5,txt:"So glad this place exists. Fresh organic produce, incredible deli — shop here every week.",dt:"Feb 2026"},{who:"Tom H.",r:4,txt:"Prices slightly higher than chains but quality and ethics are unmatched. Bulk section is a game-changer.",dt:"Jan 2026"}]},
-  {id:11,name:"Arizona Hair Design",cat:"Health & Wellness",hood:"Kyrene Corridor",addr:"4955 S Alma School Rd, Chandler (serves S. Tempe)",
-   desc:"Top-rated salon specializing in color, cuts, and extensions — known for consultations that genuinely listen to what you want.",
-   img:"https://images.unsplash.com/photo-1560066984-138dadb4c035?w=600&q=80",
-   rating:4.7,rc:2,deal:"New client: 20% off your first visit",dc:"AZNEWCLIENT",v:true,n:false,
-   revs:[{who:"Leila N.",r:5,txt:"Best salon experience in years. Stylist listened and didn't upsell. Balayage is exactly what I wanted.",dt:"Mar 2026"},{who:"Chloe K.",r:4,txt:"Clean space, friendly team, great color result. On time and easy to book.",dt:"Feb 2026"}]},
-  {id:12,name:"Desert Edge Brewery",cat:"Food & Drink",hood:"Downtown Tempe",addr:"1005 S Rural Rd, Tempe AZ 85281",
-   desc:"Award-winning craft brewery with rotating Arizona-brewed taps, a solid food menu, and one of the best patios in Tempe.",
-   img:"https://images.unsplash.com/photo-1559526324-593bc073d938?w=600&q=80",
-   rating:4.5,rc:2,deal:"Pint + appetizer combo $14 — Tues & Wed",dc:"DEDGECOMBO",v:true,n:false,
-   revs:[{who:"Nick A.",r:5,txt:"Saguaro Wheat is my go-to AZ beer. Great taproom, solid food, perfect outdoor seating.",dt:"Feb 2026"},{who:"Ana R.",r:4,txt:"Solid craft brewery. The flight is a great way to sample and staff know their beers well.",dt:"Jan 2026"}]},
-  {id:13,name:"Sun Devil Tutoring Center",cat:"Education",hood:"ASU / University",addr:"1151 S Forest Ave, Tempe AZ 85281",
-   desc:"Locally-run tutoring center with one-on-one and small group sessions in STEM, writing, and test prep for ASU students and K-12.",
-   img:"https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&q=80",
-   rating:4.4,rc:2,deal:"First session free for new students",dc:"SDSTUTOR1",v:true,n:true,
-   revs:[{who:"Riya C.",r:4,txt:"Really helped me pass orgo. Tutor was patient and explained things differently until I got it.",dt:"Mar 2026"},{who:"Mark S.",r:5,txt:"My daughter went from failing algebra to B+ in one semester. Caring, experienced tutors.",dt:"Jan 2026"}]},
-  {id:14,name:"Myke's Woodfire BBQ",cat:"Food & Drink",hood:"South Tempe",addr:"811 E Southern Ave, Tempe AZ 85282",
-   desc:"No-frills, all-flavor Tempe BBQ with slow-smoked meats and homemade sides. Loyal local following — get there before 6pm or it runs out.",
-   img:"https://images.unsplash.com/photo-1529193591184-b1d58069ecdd?w=600&q=80",
-   rating:4.8,rc:3,deal:"Family platter: $5 off on weeknights",dc:"MYKEFAM5",v:true,n:false,
-   revs:[{who:"Jerome T.",r:5,txt:"Best BBQ in the East Valley, full stop. Brisket is perfectly smoked every single time.",dt:"Mar 2026"},{who:"Kayla B.",r:5,txt:"Finally found my Tempe BBQ spot. Pulled pork sandwich with homemade slaw is incredible.",dt:"Feb 2026"},{who:"Shawn D.",r:4,txt:"Solid BBQ at honest prices. Ribs are exceptional and the cornbread is a must.",dt:"Jan 2026"}]},
-  {id:15,name:"Tempe Yoga Collective",cat:"Health & Wellness",hood:"Mill Avenue District",addr:"501 S Mill Ave, Tempe AZ 85281",
-   desc:"Community-focused studio with daily vinyasa, yin, and restorative classes. Pay-what-you-can community classes every Sunday morning.",
-   img:"https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=600&q=80",
-   rating:4.7,rc:2,deal:"Intro week: unlimited classes for $15",dc:"YOGAINTRO",v:true,n:false,
-   revs:[{who:"Alicia P.",r:5,txt:"Sunday community class is a gift. Incredible teachers, welcoming to all levels.",dt:"Mar 2026"},{who:"Derek M.",r:4,txt:"Great variety of classes. Yin yoga instructor is especially good. Studio is clean.",dt:"Feb 2026"}]},
-];
-
-const CATS=[
-  {l:"All",v:"",ic:'<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M4 6h16v2H4zm0 5h16v2H4zm0 5h16v2H4z"/></svg>'},
-  {l:"Food & Drink",v:"Food & Drink",ic:'<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M18.06 22.99h1.66c.84 0 1.53-.64 1.63-1.46L23 5.05h-5V1h-1.97v4.05h-4.97l.3 2.34c1.71.47 3.31 1.32 4.27 2.26 1.44 1.42 2.43 2.89 2.43 5.29v8.05zM1 21.99V21h15.03v.99c0 .55-.45 1-1.01 1H2.01c-.56 0-1.01-.45-1.01-1zm15.03-7c0-1.7-.8-4.16-4.73-4.98L10 11.48l-1.3-.47C4.8 11.83 4 14.28 4 15.99v2h12.03v-3z"/></svg>'},
-  {l:"Retail",v:"Retail",ic:'<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M7 18c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zM1 2v2h2l3.6 7.59-1.35 2.45c-.16.28-.25.61-.25.96C5 16.1 6.9 18 9 18h12v-2H9.42c-.14 0-.25-.11-.25-.25l.03-.12.9-1.63H19c.75 0 1.41-.41 1.75-1.03l3.58-6.49A1 1 0 0 0 23.45 5H5.21l-.94-2H1zm16 16c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z"/></svg>'},
-  {l:"Health & Wellness",v:"Health & Wellness",ic:'<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"/></svg>'},
-  {l:"Services",v:"Services",ic:'<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M22.7 19l-9.1-9.1c.9-2.3.4-5-1.5-6.9-2-2-5-2.4-7.4-1.3L9 6 6 9 1.6 4.7C.4 7.1.9 10.1 2.9 12.1c1.9 1.9 4.6 2.4 6.9 1.5l9.1 9.1c.4.4 1 .4 1.4 0l2.3-2.3c.5-.4.5-1.1.1-1.4z"/></svg>'},
-  {l:"Arts & Culture",v:"Arts & Culture",ic:'<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M12 3c-4.97 0-9 4.03-9 9s4.03 9 9 9c.83 0 1.5-.67 1.5-1.5 0-.39-.15-.74-.39-1.01-.23-.26-.38-.61-.38-.99 0-.83.67-1.5 1.5-1.5H16c2.76 0 5-2.24 5-5 0-4.42-4.03-8-9-8zm-5.5 9c-.83 0-1.5-.67-1.5-1.5S5.67 9 6.5 9 8 9.67 8 10.5 7.33 12 6.5 12zm3-4C8.67 8 8 7.33 8 6.5S8.67 5 9.5 5s1.5.67 1.5 1.5S10.33 8 9.5 8zm5 0c-.83 0-1.5-.67-1.5-1.5S13.67 5 14.5 5s1.5.67 1.5 1.5S15.33 8 14.5 8zm3 4c-.83 0-1.5-.67-1.5-1.5S16.67 9 17.5 9s1.5.67 1.5 1.5-.67 1.5-1.5 1.5z"/></svg>'},
-  {l:"Education",v:"Education",ic:'<svg viewBox="0 0 24 24" style="width:14px;height:14px;fill:currentColor"><path d="M12 3L1 9l11 6 9-4.91V17h2V9L12 3zM5 13.18v4L12 21l7-3.82v-4L12 17l-7-3.82z"/></svg>'},
-];
-
-const S={cat:'',sort:'rating',q:'',bk:tryParse(localStorage.getItem('lp_bk'),[]),data:BIZ,cid:null,stars:0,capDone:false,acapDone:false};
-function tryParse(s,d){try{return JSON.parse(s)||d;}catch{return d;}}
-
-document.addEventListener('DOMContentLoaded',()=>{renderCats();renderDeals();renderGrid();syncBdg();updateThemeUI();});
-
-/* THEME */
-function toggleTheme(){const h=document.documentElement;h.setAttribute('data-theme',h.getAttribute('data-theme')==='dark'?'light':'dark');updateThemeUI();}
-function updateThemeUI(){const d=document.documentElement.getAttribute('data-theme')==='dark';document.getElementById('isun').style.display=d?'none':'block';document.getElementById('imoon').style.display=d?'block':'none';}
-
-/* VIEWS */
-function showHome(){document.getElementById('shell').style.display='';document.getElementById('hero').style.display='';document.getElementById('bkv').classList.remove('open');document.getElementById('rptv').classList.remove('open');renderGrid();}
-function showBookmarks(){document.getElementById('shell').style.display='none';document.getElementById('hero').style.display='none';document.getElementById('bkv').classList.add('open');document.getElementById('rptv').classList.remove('open');renderBk();}
-function showReport(){document.getElementById('shell').style.display='none';document.getElementById('hero').style.display='none';document.getElementById('bkv').classList.remove('open');document.getElementById('rptv').classList.add('open');renderReport();}
-
-/* CATS */
-function renderCats(){document.getElementById('catlist').innerHTML=CATS.map(c=>{const cnt=c.v===''?BIZ.length:BIZ.filter(b=>b.cat===c.v).length;return`<button class="catbtn${S.cat===c.v?' on':''}" onclick="setCat('${c.v}',this)">${c.ic}<span>${c.l}</span><span class="cpill">${cnt}</span></button>`;}).join('');}
-function setCat(v,el){S.cat=v;document.querySelectorAll('.catbtn').forEach(b=>b.classList.remove('on'));el.classList.add('on');renderGrid();}
-
-/* SORT */
-function setSort(v,el){S.sort=v;document.querySelectorAll('.srtbtn').forEach(b=>b.classList.remove('on'));el.classList.add('on');renderGrid();}
-
-/* SEARCH */
-function doSearch(v){S.q=(v||'').trim().toLowerCase();document.getElementById('heroq').value=v||'';document.getElementById('hq').value=v||'';renderGrid();}
-function heroSearch(){S.q=document.getElementById('heroq').value.trim().toLowerCase();S.cat=document.getElementById('herocat').value;renderCats();renderGrid();document.getElementById('shell').scrollIntoView({behavior:'smooth',block:'start'});}
-function heroCat(){S.cat=document.getElementById('herocat').value;renderCats();renderGrid();}
-
-/* FILTER */
-function getFiltered(){let l=[...S.data];if(S.cat)l=l.filter(b=>b.cat===S.cat);if(S.q)l=l.filter(b=>b.name.toLowerCase().includes(S.q)||b.desc.toLowerCase().includes(S.q)||b.hood.toLowerCase().includes(S.q)||b.cat.toLowerCase().includes(S.q));if(S.sort==='rating')l.sort((a,b)=>b.rating-a.rating);else if(S.sort==='reviews')l.sort((a,b)=>b.rc-a.rc);else if(S.sort==='name')l.sort((a,b)=>a.name.localeCompare(b.name));else l.sort((a,b)=>(b.n-a.n)||b.id-a.id);return l;}
-
-/* GRID */
-function renderGrid(){const l=getFiltered(),g=document.getElementById('bgrid'),nr=document.getElementById('nores'),rc=document.getElementById('rescnt');if(!l.length){g.innerHTML='';nr.classList.add('show');rc.innerHTML='0 results';return;}nr.classList.remove('show');rc.innerHTML=`<strong>${l.length}</strong> business${l.length!==1?'es':''} · ${S.cat||'All categories'}`;g.innerHTML=l.map(b=>{const sv=S.bk.includes(b.id);return`<div class="bcard" onclick="openBiz(${b.id})"><div class="cphoto"><img src="${b.img}" alt="${b.name}" loading="lazy"><div class="ctop"><span class="cchip">${b.cat}</span>${b.deal?'<span class="dealchip">Deal</span>':''}</div><button class="bkbtn${sv?' saved':''}" onclick="togBk(event,${b.id})" aria-label="${sv?'Remove bookmark':'Save'}"><svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg></button></div><div class="cbody">${b.v?'<div class="cvrf"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Verified</div>':''}<div class="cname">${b.name}</div><div class="chood"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>${b.hood}</div><div class="cdesc">${b.desc}</div><div class="cfoot"><div class="srow">${starsH(b.rating,11)}<span class="rnum">${b.rating.toFixed(1)}</span><span class="rct">(${b.rc})</span></div><button class="vbtn" onclick="openBiz(${b.id});event.stopPropagation();">View</button></div></div></div>`;}).join('');}
-
-/* STARS */
-function starsH(r,s=12){let h='';for(let i=1;i<=5;i++)h+=`<svg class="si ${r>=i?'f':'e'}" viewBox="0 0 24 24" style="width:${s}px;height:${s}px;"><path d="M12 17.27L18.18 21l-1.64-7.03L22 9.24l-7.19-.61L12 2 9.19 8.63 2 9.24l5.46 4.73L5.82 21z"/></svg>`;return h;}
-
-/* DEALS */
-function renderDeals(){document.getElementById('deallist').innerHTML=BIZ.filter(b=>b.deal).slice(0,4).map(b=>`<div class="deal-row"><div class="dr-name">${b.name}</div><div class="dr-txt">${b.deal}</div><div class="dr-code-row"><span class="dr-code">${b.dc}</span><button class="cpybtn" onclick="cpyCode('${b.dc}')">Copy</button></div></div>`).join('');}
-function cpyCode(c){navigator.clipboard.writeText(c).then(()=>toast('Code copied: '+c,'g')).catch(()=>toast('Code: '+c,'o'));}
-
-/* BOOKMARK */
-function togBk(e,id){e.stopPropagation();const i=S.bk.indexOf(id);if(i===-1){S.bk.push(id);toast('Business saved','o');}else{S.bk.splice(i,1);toast('Removed from saved','g');}localStorage.setItem('lp_bk',JSON.stringify(S.bk));syncBdg();renderGrid();if(document.getElementById('bkv').classList.contains('open'))renderBk();}
-function syncBdg(){const b=document.getElementById('bkbdg');b.textContent=S.bk.length;b.style.display=S.bk.length?'flex':'none';}
-function renderBk(){const el=document.getElementById('bkgrid'),l=S.data.filter(b=>S.bk.includes(b.id));if(!l.length){el.innerHTML='<div class="empty"><svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg><h3>No saved businesses yet</h3><p>Tap the bookmark icon on any listing to save it here.</p></div>';return;}el.innerHTML=`<div style="display:grid;grid-template-columns:repeat(auto-fill,minmax(295px,1fr));gap:1rem;">${l.map(b=>`<div class="bcard" onclick="openBiz(${b.id})"><div class="cphoto"><img src="${b.img}" alt="${b.name}" loading="lazy"><div class="ctop"><span class="cchip">${b.cat}</span>${b.deal?'<span class="dealchip">Deal</span>':''}</div><button class="bkbtn saved" onclick="togBk(event,${b.id})" aria-label="Remove bookmark"><svg viewBox="0 0 24 24"><path d="M17 3H7c-1.1 0-2 .9-2 2v16l7-3 7 3V5c0-1.1-.9-2-2-2z"/></svg></button></div><div class="cbody">${b.v?'<div class="cvrf"><svg viewBox="0 0 24 24"><path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z"/></svg>Verified</div>':''}<div class="cname">${b.name}</div><div class="chood"><svg viewBox="0 0 24 24"><path d="M12 2C8.13 2 5 5.13 5 9c0 5.25 7 13 7 13s7-7.75 7-13c0-3.87-3.13-7-7-7z"/></svg>${b.hood}</div><div class="cdesc">${b.desc}</div><div class="cfoot"><div class="srow">${starsH(b.rating,11)}<span class="rnum">${b.rating.toFixed(1)}</span><span class="rct">(${b.rc})</span></div><button class="vbtn" onclick="openBiz(${b.id});event.stopPropagation();">View</button></div></div></div>`).join('')}</div>`;}
-
-/* BIZ MODAL */
-function openBiz(id){const b=S.data.find(x=>x.id===id);if(!b)return;S.cid=id;S.stars=0;S.capDone=false;document.getElementById('mimg').src=b.img;document.getElementById('mimg').alt=b.name;document.getElementById('mname').textContent=b.name;document.getElementById('mcat').textContent=b.cat.toUpperCase()+' · '+b.hood;document.getElementById('maddr').textContent=b.addr;document.getElementById('mvrf').style.display=b.v?'flex':'none';document.getElementById('mdesc').textContent=b.desc;document.getElementById('mrsum').innerHTML=`<div class="rbig">${b.rating.toFixed(1)}</div><div><div class="srow">${starsH(b.rating,14)}</div><div class="rsub" style="margin-top:0.2rem;">${b.rc} review${b.rc!==1?'s':''}</div></div>`;document.getElementById('mdealbox').innerHTML=b.deal?`<div class="dealbox"><div class="db-lbl">Active Deal</div><div class="db-txt">${b.deal}</div><div class="dr-code-row"><span class="dr-code">${b.dc}</span><button class="cpybtn" onclick="cpyCode('${b.dc}')">Copy code</button></div></div>`:'';renderMRevs(b);['rn','rt'].forEach(i=>document.getElementById(i).value='');document.querySelectorAll('.sps').forEach(s=>s.classList.remove('on'));['en','es','et','ec'].forEach(i=>document.getElementById(i).classList.remove('show'));document.getElementById('cap').classList.remove('on');document.getElementById('bovl').classList.add('open');document.body.style.overflow='hidden';}
-function renderMRevs(b){document.getElementById('mrevs').innerHTML=b.revs.map(r=>`<div class="rv-item"><div class="rv-hd"><span class="rv-who">${r.who}</span><div class="rv-meta"><div class="srow">${starsH(r.r,10)}</div><span class="rv-date">${r.dt}</span></div></div><div class="rv-txt">${r.txt}</div></div>`).join('');}
-function closeBiz(){document.getElementById('bovl').classList.remove('open');document.body.style.overflow='';}
-
-/* REVIEW */
-function pickS(v){S.stars=v;document.querySelectorAll('.sps').forEach(s=>s.classList.toggle('on',parseInt(s.dataset.v)<=v));}
-function togCap(boxId,sk){S[sk]=!S[sk];document.getElementById(boxId).classList.toggle('on',S[sk]);}
-function submitRev(){const n=document.getElementById('rn').value.trim(),t=document.getElementById('rt').value.trim();let ok=true;const sh=(id,f)=>{document.getElementById(id).classList.toggle('show',f);if(f)ok=false;};sh('en',n.length<2);sh('es',S.stars===0);sh('et',t.length<10);sh('ec',!S.capDone);if(!ok)return;const b=S.data.find(x=>x.id===S.cid);b.revs.unshift({who:n,r:S.stars,txt:t,dt:new Date().toLocaleDateString('en-US',{month:'short',year:'numeric'})});b.rc=b.revs.length;b.rating=parseFloat((b.revs.reduce((s,r)=>s+r.r,0)/b.rc).toFixed(1));renderMRevs(b);document.getElementById('mrsum').innerHTML=`<div class="rbig">${b.rating.toFixed(1)}</div><div><div class="srow">${starsH(b.rating,14)}</div><div class="rsub" style="margin-top:0.2rem;">${b.rc} reviews</div></div>`;['rn','rt'].forEach(i=>document.getElementById(i).value='');document.querySelectorAll('.sps').forEach(s=>s.classList.remove('on'));S.stars=0;S.capDone=false;document.getElementById('cap').classList.remove('on');renderGrid();toast('Review submitted — thank you!','g');}
-
-/* ADD */
-function openAdd(){document.getElementById('aovl').classList.add('open');document.body.style.overflow='hidden';}
-function closeAdd(){document.getElementById('aovl').classList.remove('open');document.body.style.overflow='';}
-function submitBiz(){const n=document.getElementById('an').value.trim(),c=document.getElementById('ac').value,h=document.getElementById('ah').value,a=document.getElementById('aa').value.trim(),d=document.getElementById('ad').value.trim(),dl=document.getElementById('adl').value.trim();let ok=true;const sh=(id,f)=>{document.getElementById(id).classList.toggle('show',f);if(f)ok=false;};sh('aen',n.length<2);sh('aec',!c);sh('aeh',!h);sh('aea',a.length<5);sh('aed',d.length<20);sh('aecp',!S.acapDone);if(!ok)return;const IMGS={'Food & Drink':'https://images.unsplash.com/photo-1414235077428-338989a2e8c0?w=600&q=80','Retail':'https://images.unsplash.com/photo-1507842217343-583bb7270b66?w=600&q=80','Health & Wellness':'https://images.unsplash.com/photo-1506629082955-511b1aa562c8?w=600&q=80','Services':'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&q=80','Arts & Culture':'https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?w=600&q=80','Education':'https://images.unsplash.com/photo-1434030216411-0b793f4b4173?w=600&q=80'};S.data.unshift({id:Date.now(),name:n,cat:c,hood:h,addr:a,desc:d,img:IMGS[c]||IMGS.Retail,rating:0,rc:0,revs:[],deal:dl||null,dc:dl?n.toUpperCase().replace(/\s+/g,'').slice(0,8)+'10':null,v:false,n:true});renderCats();renderDeals();renderGrid();closeAdd();toast(`"${n}" listed successfully`,'o');['an','aa','ad','adl'].forEach(i=>document.getElementById(i).value='');['ac','ah'].forEach(i=>document.getElementById(i).value='');S.acapDone=false;document.getElementById('acap').classList.remove('on');}
-
-/* REPORT */
-function renderReport(){const cat=document.getElementById('rcat').value,mn=parseFloat(document.getElementById('rmin').value),srt=document.getElementById('rsort').value;let l=[...S.data].filter(b=>(!cat||b.cat===cat)&&b.rating>=mn);if(srt==='rating')l.sort((a,b)=>b.rating-a.rating);else if(srt==='reviews')l.sort((a,b)=>b.rc-a.rc);else l.sort((a,b)=>a.name.localeCompare(b.name));const avg=l.length?(l.reduce((s,b)=>s+b.rating,0)/l.length).toFixed(2):'—';document.getElementById('rptsum').innerHTML=`<div class="scard hi"><div class="sv">${l.length}</div><div class="sl">Businesses</div></div><div class="scard"><div class="sv">${avg}</div><div class="sl">Avg Rating</div></div><div class="scard"><div class="sv">${l.reduce((s,b)=>s+b.rc,0)}</div><div class="sl">Total Reviews</div></div><div class="scard"><div class="sv">${l.filter(b=>b.deal).length}</div><div class="sl">Active Deals</div></div>`;document.getElementById('rptbody').innerHTML=l.map((b,i)=>`<tr><td style="color:var(--tx3);font-family:'Geist Mono',monospace;font-size:0.76rem;">${i+1}</td><td><strong>${b.name}</strong>${b.n?' <span style="font-size:0.6rem;background:var(--green);color:#fff;padding:0.1rem 0.38rem;border-radius:999px;font-weight:700;margin-left:4px;">NEW</span>':''}</td><td style="color:var(--tx2);">${b.cat}</td><td style="color:var(--tx2);">${b.hood}</td><td><div style="display:flex;align-items:center;gap:0.28rem;">${starsH(b.rating,10)}<span style="font-weight:600;font-size:0.8rem;margin-left:2px;">${b.rating>0?b.rating.toFixed(1):'—'}</span></div></td><td style="font-family:'Geist Mono',monospace;">${b.rc}</td><td style="color:${b.deal?'var(--gold)':'var(--tx3)'};">${b.deal?'Yes':'—'}</td><td style="color:${b.v?'var(--green)':'var(--tx3)'};">${b.v?'Yes':'—'}</td></tr>`).join('');}
-function exportCSV(){const r=[['Name','Category','Neighborhood','Address','Rating','Reviews','Deal','Verified'],...[...S.data].map(b=>[`"${b.name}"`,`"${b.cat}"`,`"${b.hood}"`,`"${b.addr}"`,b.rating.toFixed(1),b.rc,b.deal?`"${b.deal}"`:'',b.v?'Yes':'No'])];const a=document.createElement('a');a.href=URL.createObjectURL(new Blob([r.map(x=>x.join(',')).join('\n')],{type:'text/csv'}));a.download='LocalPulse_Tempe_Report.csv';a.click();toast('CSV exported','g');}
-
-/* HELPERS */
-function ovlClick(e,id,fn){if(e.target===document.getElementById(id))fn();}
-let tt;function toast(m,t='g'){const el=document.getElementById('toast');el.className=t;el.classList.add('show');document.getElementById('tmsg').textContent=m;clearTimeout(tt);tt=setTimeout(()=>el.classList.remove('show'),3000);}
-</script>
-</body>
-</html>
+<!-- AI CHAT -->
+<button id="ai-fab" onclick="toggleAI()" aria-label="AI Assistant"><svg viewBox="0 0 24 24"><path d="M20 2H4c-1.1 0-2 .9-2 2v18l4-4h14c1.1 0 2-.9 2-2V4c0-1.1-.9-2-2-2zm-2 12H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"/></svg></button>
+<div id="ai-panel">
+  <div class="ai-head"><div><div class="ai-head-title">AI Business Assistant</div><div class="ai-head-sub">Ask me about Tempe businesses</div></div><button class="ai-close" onclick="toggleAI()">✕</button></div>
+  <div class="ai-msgs" id="ai-msgs"><div class="ai-msg bot">Hi! I'm your LocalPulse AI. Ask me to find the best restaurants, shops, or services in Tempe — I know all the local listings!</div></div>
+  <div class="ai-suggestions" id="ai-sugs">
+    <span class="ai-sug" onclick="aiSuggest(this)">Best coffee near ASU</span>
+    <span class="ai-sug" onclick="aiSuggest(this)">Highly rated restaurants</span>
+    <span class="ai-sug" onclick="aiSuggest(this)">Businesses with deals</span>
+    <span class="ai-sug" onclick="aiSuggest(this)">Best date night spot</span>
+  </div>
+  <div class="ai-foot"><input class="ai-input" id="ai-q" type="text" placeholder="Ask about Tempe businesses…" onkeydown="if(event.key==='Enter')sendAI()" aria-label="Ask AI"><button class="ai-send" oncli
